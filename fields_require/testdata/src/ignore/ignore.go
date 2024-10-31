@@ -1,0 +1,37 @@
+package ignore
+
+type SampleStruct struct {
+	Field1 int
+	Field2 string
+	Field3 bool
+}
+
+func Defined123() SampleStruct {
+	return SampleStruct{
+		Field1: 1,
+		Field2: "hello",
+		Field3: true,
+	}
+}
+
+func Defined12() SampleStruct {
+	return SampleStruct{ // want "fields 'Field3' are not initialized"
+		Field1: 1,
+		Field2: "hello",
+	}
+}
+
+func Defined12Ignored() SampleStruct {
+	// ignore:fields_require
+	return SampleStruct{
+		Field1: 1,
+		Field2: "hello",
+	}
+}
+
+func Defined13() SampleStruct {
+	return SampleStruct{ // want "fields 'Field2' are not initialized"
+		Field1: 1,
+		Field3: true,
+	}
+}
