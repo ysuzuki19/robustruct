@@ -21,7 +21,7 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	structInits := struct_init.List(pass)
+	structInits := struct_init.List(*pass)
 	for _, si := range structInits {
 		// Fast path:
 		// - if the struct is ignored by comment
@@ -37,13 +37,16 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		isAligned := true
 		for i, elt := range si.CompLit.Elts {
 			kv, ok := elt.(*ast.KeyValueExpr)
-			if !ok {
+			if !ok || kv == nil {
 				isUnnamed = true
+				continue
 			}
 			field := si.TypeStruct.Field(i)
+			if field == nil {
+				continue
+			}
 			key, ok := kv.Key.(*ast.Ident)
-			if !ok {
-				println("key is not ident %s", kv.Key)
+			if !ok || key == nil {
 				continue
 			}
 			if key.Name != field.Name() {
@@ -59,13 +62,15 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 		fieldInits := make(map[string]*ast.KeyValueExpr)
 		for _, elt := range si.CompLit.Elts {
-			if kv, ok := elt.(*ast.KeyValueExpr); ok {
-				if ident, ok := kv.Key.(*ast.Ident); ok {
-					fieldInits[ident.Name] = kv
-				} else {
-					continue
-				}
+			kv, ok := elt.(*ast.KeyValueExpr)
+			if !ok || kv == nil {
+				continue
 			}
+			ident, ok := kv.Key.(*ast.Ident)
+			if !ok || ident == nil {
+				continue
+			}
+			fieldInits[ident.Name] = kv
 		}
 
 		var buf bytes.Buffer

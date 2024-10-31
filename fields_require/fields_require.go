@@ -24,7 +24,7 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	structInits := struct_init.List(pass)
+	structInits := struct_init.List(*pass)
 	for _, si := range structInits {
 		// Fast path: all fields are initialized
 		if si.TypeStruct.NumFields() == len(si.CompLit.Elts) {
@@ -59,9 +59,11 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 
 		if len(missingFields) > 0 {
-			fieldsCSV := missingFields[0].Key.(*ast.Ident).Name
+			var fieldsCSV bytes.Buffer
+			_ = format.Node(&fieldsCSV, pass.Fset, missingFields[0].Key)
 			for _, field := range missingFields[1:] {
-				fieldsCSV += ", " + field.Key.(*ast.Ident).Name
+				fieldsCSV.WriteString(", ")
+				_ = format.Node(&fieldsCSV, pass.Fset, field.Key)
 			}
 
 			// if all fields are missing, add a newline before the first field
@@ -71,7 +73,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 			for _, field := range missingFields {
 				if err := format.Node(&buf, pass.Fset, field); err != nil {
-					panic(err)
+					continue
 				}
 				buf.WriteString(",\n")
 			}
@@ -79,7 +81,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 			pass.Report(analysis.Diagnostic{
 				Pos:     si.CompLit.Pos(),
-				Message: fmt.Sprintf("fields '%s' are not initialized", fieldsCSV),
+				Message: fmt.Sprintf("fields '%s' are not initialized", fieldsCSV.String()),
 				// Message: "all fields are required for initializing", // to improve performance
 				SuggestedFixes: []analysis.SuggestedFix{
 					{

@@ -9,13 +9,16 @@ import (
 )
 
 type StructInit struct {
-	pass       *analysis.Pass
-	AstFile    *ast.File
-	CompLit    *ast.CompositeLit
+	pass       analysis.Pass
+	AstFile    ast.File
+	CompLit    ast.CompositeLit
 	TypeStruct types.Struct
 }
 
 func (si StructInit) IsIgnored(pattern string) bool {
+	if si.pass.Fset == nil {
+		return false
+	}
 	structPos := si.pass.Fset.Position(si.CompLit.Pos())
 	for _, commentGroup := range si.AstFile.Comments {
 		commentPos := si.pass.Fset.Position(commentGroup.End())
@@ -31,32 +34,43 @@ func (si StructInit) IsIgnored(pattern string) bool {
 	return false
 }
 
-func List(pass *analysis.Pass) (found []StructInit) {
+func List(pass analysis.Pass) (found []StructInit) {
 	for _, file := range pass.Files {
+		if file == nil {
+			continue
+		}
 		ast.Inspect(file, func(n ast.Node) bool {
 			if n == nil {
 				return false
 			}
 			compLit, ok := n.(*ast.CompositeLit)
-			if !ok {
+			if !ok || compLit == nil {
 				return true
 			}
 
+			if pass.TypesInfo == nil {
+				return true
+			}
 			typ := pass.TypesInfo.TypeOf(compLit)
 			if typ == nil {
 				return true
 			}
 
-			typeStruct, ok := pass.TypesInfo.TypeOf(compLit).Underlying().(*types.Struct)
-			if !ok {
+			ul := typ.Underlying()
+			if ul == nil {
+				return true
+			}
+
+			typeStruct, ok := ul.(*types.Struct)
+			if !ok || typeStruct == nil {
 				return true
 			}
 
 			found = append(found, StructInit{
 				pass:       pass,
-				CompLit:    compLit,
+				CompLit:    *compLit,
 				TypeStruct: *typeStruct,
-				AstFile:    file,
+				AstFile:    *file,
 			})
 			return true
 		})
