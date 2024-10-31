@@ -1,0 +1,8 @@
+linters-settings:
+  custom:
+    robustruct:
+      type: "module"
+
+linters:
+  enable:
+    - robustruct

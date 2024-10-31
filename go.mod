@@ -2,7 +2,10 @@ module github.com/ysuzuki19/robustruct
 
 go 1.23.2
 
-require golang.org/x/tools v0.26.0
+require (
+	github.com/golangci/plugin-module-register v0.1.1
+	golang.org/x/tools v0.26.0
+)
 
 require (
 	golang.org/x/mod v0.21.0 // indirect
