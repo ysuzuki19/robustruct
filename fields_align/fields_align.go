@@ -41,7 +41,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				isUnnamed = true
 			}
 			field := si.TypeStruct.Field(i)
-			if kv.Key.(*ast.Ident).Name != field.Name() {
+			key, ok := kv.Key.(*ast.Ident)
+			if !ok {
+				println("key is not ident %s", kv.Key)
+				continue
+			}
+			if key.Name != field.Name() {
 				isAligned = false
 			}
 		}
@@ -68,8 +73,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		for i := 0; i < si.TypeStruct.NumFields(); i++ {
 			field := si.TypeStruct.Field(i)
 			if kv, ok := fieldInits[field.Name()]; ok {
-				buf.WriteString(field.Name() + ": ")
-				if err := format.Node(&buf, pass.Fset, kv.Value); err != nil {
+				if err := format.Node(&buf, pass.Fset, kv); err != nil {
 					panic(err)
 				}
 				buf.WriteString(",\n")

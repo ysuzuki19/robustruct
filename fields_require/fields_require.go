@@ -1,8 +1,10 @@
 package fields_require
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/token"
 	"go/types"
 
@@ -63,10 +65,17 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 
 			// if all fields are missing, add a newline before the first field
-			optionalLF := ""
+			var buf bytes.Buffer
 			if len(missingFields) == si.TypeStruct.NumFields() {
-				optionalLF = "\n"
+				buf.WriteString("\n")
 			}
+			for _, field := range missingFields {
+				if err := format.Node(&buf, pass.Fset, field); err != nil {
+					panic(err)
+				}
+				buf.WriteString(",\n")
+			}
+			newText := buf.Bytes()
 
 			pass.Report(analysis.Diagnostic{
 				Pos:     si.CompLit.Pos(),
@@ -79,7 +88,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 							{
 								Pos:     si.CompLit.Rbrace,
 								End:     si.CompLit.Rbrace,
-								NewText: []byte(optionalLF + generateFieldsText(missingFields)),
+								NewText: newText,
 							},
 						},
 					},
@@ -114,20 +123,4 @@ func generateDefaultExpr(typ types.Type, samePackage bool) ast.Expr {
 		return ast.NewIdent(typ.String() + "{}")
 	}
 	return ast.NewIdent("nil")
-}
-
-func generateFieldsText(fields []*ast.KeyValueExpr) string {
-	var text string
-	for _, field := range fields {
-		name := field.Key.(*ast.Ident).Name
-		var value string
-		switch field.Value.(type) {
-		case *ast.BasicLit:
-			value = field.Value.(*ast.BasicLit).Value
-		case *ast.Ident:
-			value = field.Value.(*ast.Ident).Name
-		}
-		text += name + ": " + value + ",\n"
-	}
-	return text
 }
