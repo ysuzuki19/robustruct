@@ -54,7 +54,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 			missingFields = append(missingFields, &ast.KeyValueExpr{
 				Key:   ast.NewIdent(field.Name()),
-				Value: generateDefaultExpr(field.Type(), pass.Pkg.Path() == field.Pkg().Path()),
+				Value: generateDefaultExpr(field.Type(), si.IsSamePackage()),
 			})
 		}
 
@@ -101,7 +101,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	return nil, nil
 }
 
-func generateDefaultExpr(typ types.Type, samePackage bool) ast.Expr {
+func generateDefaultExpr(typ types.Type, isSamePackage bool) ast.Expr {
 	switch t := typ.Underlying().(type) {
 	case *types.Basic:
 		switch t.Kind() {
@@ -115,7 +115,7 @@ func generateDefaultExpr(typ types.Type, samePackage bool) ast.Expr {
 			return ast.NewIdent("false")
 		}
 	}
-	if samePackage {
+	if isSamePackage {
 		if named, ok := typ.(*types.Named); ok {
 			// return without package
 			return ast.NewIdent(named.Obj().Name() + "{}")
