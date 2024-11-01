@@ -33,15 +33,6 @@ func DefinedUnalignedAll() SampleStruct {
 	}
 }
 
-// failed fields_require, fields_align
-func DefinedLackedUnaligned() SampleStruct {
-	return SampleStruct{
-		Field1: 1,
-		Field3: true,
-		Field2: "",
-	}
-}
-
 // ignore by packages
 func IgnorePackages() SampleStruct {
 	// ignore:fields_require
@@ -61,3 +52,11 @@ func IgnoreMod() SampleStruct {
 	}
 }
 
+// failed fields_require, fields_align
+func DefinedLackedUnaligned() SampleStruct {
+	return SampleStruct{
+		Field1: 1,
+		Field3: true,
+		Field2: "",
+	}
+}

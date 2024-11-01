@@ -31,14 +31,6 @@ func DefinedUnalignedAll() SampleStruct {
 	}
 }
 
-// failed fields_require, fields_align
-func DefinedLackedUnaligned() SampleStruct {
-	return SampleStruct{ // want "fields 'Field2' are not initialized" "all fields of the struct must be sorted by defined order"
-		Field3: true,
-		Field1: 1,
-	}
-}
-
 // ignore by packages
 func IgnorePackages() SampleStruct {
 	// ignore:fields_require
@@ -53,6 +45,14 @@ func IgnorePackages() SampleStruct {
 func IgnoreMod() SampleStruct {
 	// ignore:robustruct
 	return SampleStruct{
+		Field3: true,
+		Field1: 1,
+	}
+}
+
+// failed fields_require, fields_align
+func DefinedLackedUnaligned() SampleStruct {
+	return SampleStruct{ // want "fields 'Field2' are not initialized" "all fields of the struct must be sorted by defined order"
 		Field3: true,
 		Field1: 1,
 	}
