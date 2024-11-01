@@ -12,6 +12,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 
+	"github.com/ysuzuki19/robustruct/internal/field_init"
 	"github.com/ysuzuki19/robustruct/internal/struct_init"
 )
 
@@ -47,38 +48,29 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 		}
 
-		var missingFields []*ast.KeyValueExpr
+		missingFields := field_init.NewFieldInits(pass, si.TypeStruct.NumFields()-len(si.CompLit.Elts))
 		for _, field := range si.ListVisibleFields() {
 			if initializedFields[field.Name()] {
 				continue
 			}
-			missingFields = append(missingFields, &ast.KeyValueExpr{
-				Key:   ast.NewIdent(field.Name()),
-				Colon: 0,
-				Value: generateDefaultExpr(field.Type(), si.IsSamePackage()),
-			})
+			missingFields.PushExpr(field.Name(), generateDefaultExpr(field.Type(), si.IsSamePackage()))
 		}
 
-		if len(missingFields) > 0 {
+		if missingFields.Len() > 0 {
 			var fieldsCSV bytes.Buffer
-			_ = format.Node(&fieldsCSV, pass.Fset, missingFields[0].Key)
-			for _, field := range missingFields[1:] {
+			_ = format.Node(&fieldsCSV, pass.Fset, missingFields.List()[0].Key())
+			for _, field := range missingFields.List()[1:] {
 				fieldsCSV.WriteString(", ")
-				_ = format.Node(&fieldsCSV, pass.Fset, field.Key)
+				_ = format.Node(&fieldsCSV, pass.Fset, field.Key())
 			}
 
-			// if all fields are missing, add a newline before the first field
-			var buf bytes.Buffer
-			if len(missingFields) == si.TypeStruct.NumFields() {
-				buf.WriteString("\n")
+			newText, err := missingFields.ToBytes()
+			if err != nil {
+				return nil, err
 			}
-			for _, field := range missingFields {
-				if err := format.Node(&buf, pass.Fset, field); err != nil {
-					continue
-				}
-				buf.WriteString(",\n")
+			if len(initializedFields) == 0 {
+				newText = append([]byte{'\n'}, newText...)
 			}
-			newText := buf.Bytes()
 
 			pass.Report(analysis.Diagnostic{
 				Pos:      si.CompLit.Pos(),
@@ -87,8 +79,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				Message:  fmt.Sprintf("fields '%s' are not initialized", fieldsCSV.String()),
 				URL:      "",
 				SuggestedFixes: []analysis.SuggestedFix{{
-					Message:   "Add a missing fields",
-					TextEdits: []analysis.TextEdit{{Pos: si.CompLit.Rbrace, End: si.CompLit.Rbrace, NewText: newText}},
+					Message: "Add a missing fields",
+					TextEdits: []analysis.TextEdit{{
+						Pos:     si.CompLit.Rbrace,
+						End:     si.CompLit.Rbrace,
+						NewText: newText,
+					}},
 				}},
 				Related: []analysis.RelatedInformation{},
 			})

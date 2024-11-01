@@ -84,10 +84,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				alignedFields.PushKeyValueExpr(kve)
 			}
 		}
+
 		newText, err := alignedFields.ToBytes()
 		if err != nil {
 			return nil, err
 		}
+		newText = append([]byte{'\n'}, newText...)
 
 		pass.Report(analysis.Diagnostic{
 			Pos:      si.CompLit.Pos(),

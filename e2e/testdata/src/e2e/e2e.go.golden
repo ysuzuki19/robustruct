@@ -83,7 +83,9 @@ func NewWrapSubCollect() WrapSub {
 
 func NewWrapSubEmpty() WrapSub {
 	return WrapSub{ 
-		Sub: sub.SubSample{ A: 0, }, // want "fields 'A' are not initialized"
+		Sub: sub.SubSample{
+			A: 0,
+		}, // want "fields 'A' are not initialized"
 	}
 }
 
