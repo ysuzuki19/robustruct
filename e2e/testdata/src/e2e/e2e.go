@@ -1,4 +1,4 @@
-package fix
+package e2e
 
 type SampleStruct struct {
 	Field1 int
