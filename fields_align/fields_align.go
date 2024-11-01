@@ -81,7 +81,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		for i := 0; i < si.TypeStruct.NumFields(); i++ {
 			field := si.TypeStruct.Field(i)
 			if kve, ok := kves[field.Name()]; ok {
-				alignedFields.Push(field_init.NewFieldInit(kve))
+				alignedFields.PushKeyValueExpr(kve)
 			}
 		}
 		newText, err := alignedFields.ToBytes()

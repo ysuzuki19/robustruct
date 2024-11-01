@@ -12,12 +12,6 @@ type FieldInit struct {
 	kve *ast.KeyValueExpr
 }
 
-func NewFieldInit(kve *ast.KeyValueExpr) *FieldInit {
-	return &FieldInit{
-		kve: kve,
-	}
-}
-
 func (fi *FieldInit) Write(pass *analysis.Pass, buf *bytes.Buffer) error {
 	return format.Node(buf, pass.Fset, fi.kve)
 }
@@ -49,4 +43,8 @@ func (fis *FieldInits) ToBytes() ([]byte, error) {
 
 func (fis *FieldInits) Push(i *FieldInit) {
 	fis.list = append(fis.list, i)
+}
+
+func (fis *FieldInits) PushKeyValueExpr(kve *ast.KeyValueExpr) {
+	fis.Push(&FieldInit{kve})
 }
