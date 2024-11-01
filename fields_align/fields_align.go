@@ -1,23 +1,28 @@
 package fields_align
 
 import (
-	"bytes"
+	"flag"
 	"go/ast"
-	"go/format"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 
+	"github.com/ysuzuki19/robustruct/internal/field_init"
 	"github.com/ysuzuki19/robustruct/internal/struct_init"
 )
 
 var Analyzer = &analysis.Analyzer{
 	Name: "fields_align",
 	Doc:  "checks that all fields of a struct are sorted by defined order",
-	Run:  run,
-	Requires: []*analysis.Analyzer{
-		inspect.Analyzer,
+	URL:  "",
+	Flags: flag.FlagSet{
+		Usage: func() {},
 	},
+	Run:              run,
+	RunDespiteErrors: false,
+	Requires:         []*analysis.Analyzer{inspect.Analyzer},
+	ResultType:       nil,
+	FactTypes:        []analysis.Fact{},
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
@@ -32,7 +37,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			continue
 		}
 
-		if si.IsUnnamed() {
+		if si.IsUnnamed() || len(si.ListVisibleFields()) == 0 {
 			continue
 		}
 
@@ -58,7 +63,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			continue
 		}
 
-		fieldInits := make(map[string]*ast.KeyValueExpr)
+		kves := make(map[string]*ast.KeyValueExpr)
 		for _, elt := range si.CompLit.Elts {
 			kv, ok := elt.(*ast.KeyValueExpr)
 			if !ok || kv == nil {
@@ -68,25 +73,27 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			if !ok || ident == nil {
 				continue
 			}
-			fieldInits[ident.Name] = kv
+			kves[ident.Name] = kv
 		}
 
-		var buf bytes.Buffer
-		buf.WriteString("\n")
+		alignedFields := field_init.NewFieldInits(pass, si.TypeStruct.NumFields())
 		for i := 0; i < si.TypeStruct.NumFields(); i++ {
 			field := si.TypeStruct.Field(i)
-			if kv, ok := fieldInits[field.Name()]; ok {
-				if err := format.Node(&buf, pass.Fset, kv); err != nil {
-					panic(err)
-				}
-				buf.WriteString(",\n")
+			if kve, ok := kves[field.Name()]; ok {
+				alignedFields.Push(field_init.NewFieldInit(kve))
 			}
 		}
-		newText := buf.Bytes()
+		newText, err := alignedFields.ToBytes()
+		if err != nil {
+			return nil, err
+		}
 
 		pass.Report(analysis.Diagnostic{
-			Pos:     si.CompLit.Pos(),
-			Message: "all fields of the struct must be sorted by defined order",
+			Pos:      si.CompLit.Pos(),
+			End:      0,
+			Category: "",
+			Message:  "all fields of the struct must be sorted by defined order",
+			URL:      "",
 			SuggestedFixes: []analysis.SuggestedFix{
 				{
 					Message: "Align fields by defined order",
@@ -99,6 +106,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 					},
 				},
 			},
+			Related: []analysis.RelatedInformation{},
 		})
 	}
 	return nil, nil
