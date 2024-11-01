@@ -1,21 +1,15 @@
 package main
 
-type Sample struct {
+type Human struct {
 	Name string
 	Age  int
 }
 
 func main() {
-	s := Sample{
+	s := Human{
 		Name: "John",
 		Age:  30,
 	}
 	println(s.Name)
 	println(s.Age)
-
-	s2 := Sample{
-		Name: "Alice",
-	}
-	println(s2.Name)
-	println(s2.Age)
 }
