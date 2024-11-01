@@ -12,3 +12,8 @@ func TestE2E(t *testing.T) {
 	testdata := analysistest.TestData()
 	analysistest.RunWithSuggestedFixes(t, testdata, robustruct.Analyzer, "e2e")
 }
+
+func TestSample(t *testing.T) {
+	testdata := analysistest.TestData()
+	analysistest.RunWithSuggestedFixes(t, testdata, robustruct.Analyzer, "sample")
+}

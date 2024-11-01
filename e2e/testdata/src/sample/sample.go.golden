@@ -1,0 +1,25 @@
+package sample
+
+type Sample struct {
+	A  int
+	B  string
+	AA bool
+}
+
+func Sample1() {
+	s := Sample{ // want "fields 'AA' are not initialized"
+		A:  1,
+		B:  "hello",
+		AA: false,
+	}
+	_ = s
+}
+
+func Sample2() {
+	s := Sample{
+		A:  1,
+		B:  "hello",
+		AA: false,
+	}
+	_ = s
+}
