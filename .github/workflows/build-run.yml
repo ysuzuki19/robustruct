@@ -4,7 +4,7 @@ on:
     branches: '*'
 
 jobs:
-  test:
+  build-run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,8 +18,9 @@ jobs:
         run: |
           cd setup
           make build
+          mkdir ${HOME}/.local/bin/
           make install
 
       - name: Run
         run: |
-          golangci-lint run
+          ${HOME}/.local/bin/golangci-lint run
