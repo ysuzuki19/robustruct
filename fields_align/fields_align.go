@@ -29,16 +29,17 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	structInits := struct_init.List(*pass)
 	for _, si := range structInits {
 		// Fast path:
-		// - if the struct is ignored by comment
-		// - if the number of fields of the struct is not equal to the number of initialized fields
-		// - if the number of fields of the struct is 0
+		// - if ignore comment exists
+		// - if struct has no fields
+		// - if struct definition is unnamed
+		// - if struct has no visible fields
 		if si.IsIgnored("ignore:fields_align") ||
-			si.TypeStruct.NumFields() == 0 {
-			continue
-		}
-
-		if si.IsUnnamed() || len(si.ListVisibleFields()) == 0 {
-			continue
+			si.TypeStruct.NumFields() == 0 ||
+			si.IsUnnamed() ||
+			len(si.ListVisibleFields()) == 0 {
+			{
+				continue
+			}
 		}
 
 		isAligned := true
