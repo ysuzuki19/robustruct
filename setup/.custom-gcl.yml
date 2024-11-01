@@ -3,5 +3,5 @@ name: golangci-lint
 destination: bin
 plugins:
   - module: "github.com/ysuzuki19/robustruct"
-    import: "github.com/ysuzuki19/robustruct/robustruct"
+    import: "github.com/ysuzuki19/robustruct/plugin"
     path: ".."
