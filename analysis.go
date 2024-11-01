@@ -7,19 +7,16 @@ import (
 	"github.com/ysuzuki19/robustruct/fields_require"
 )
 
-var Analyzer = &analysis.Analyzer{
-	Name: "robustruct",
-	Doc:  "robustruct is a suite of analyzers for struct literals",
-	Run:  run,
-	Requires: []*analysis.Analyzer{
-		fields_require.Analyzer,
-		fields_align.Analyzer,
-	},
-}
-
 var analyzers = []*analysis.Analyzer{
 	fields_require.Analyzer,
 	fields_align.Analyzer,
+}
+
+var Analyzer = &analysis.Analyzer{
+	Name:     "robustruct",
+	Doc:      "robustruct is a suite of analyzers for struct literals",
+	Run:      run,
+	Requires: analyzers,
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
