@@ -1,5 +1,8 @@
+.PHONY: build
+
 RM := rm -f
 CMP := cmp -s
+GO := go
 
 BIN_NAME = golangci-lint
 BUILD_PATH = bin/$(BIN_NAME)
@@ -8,7 +11,7 @@ COMPARE_BINS = $(CMP) $(BUILD_PATH) $(INSTALL_PATH)
 
 build:
 	@echo "Building $(BUILD_PATH)..."
-	@golangci-lint custom
+	@$(GO) run build/main.go
 	@echo "Built    $(BUILD_PATH)!"
 
 install: check-built
