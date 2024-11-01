@@ -47,8 +47,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 
 		var missingFields []*ast.KeyValueExpr
-		for i := 0; i < si.TypeStruct.NumFields(); i++ {
-			field := si.TypeStruct.Field(i)
+		for _, field := range si.ListVisibleFields() {
 			if initializedFields[field.Name()] {
 				continue
 			}

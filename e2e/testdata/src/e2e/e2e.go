@@ -1,5 +1,7 @@
 package e2e
 
+import "e2e/sub"
+
 type SampleStruct struct {
 	Field1 int
 	Field2 string
@@ -62,4 +64,51 @@ type EmptyStruct struct{}
 
 func NewEmptyStruct() EmptyStruct {
 	return EmptyStruct{}
+}
+
+type WrapSub struct {
+	Sub sub.SubSample
+}
+
+func NewWrapSubCollect() WrapSub {
+	return WrapSub{
+		Sub: sub.SubSample{
+			A: 1,
+		},
+	}
+}
+
+func NewWrapSubEmpty() WrapSub {
+	return WrapSub{
+		Sub: sub.SubSample{}, // want "fields 'A' are not initialized"
+	}
+}
+
+type WrapSubPub struct {
+	Sub sub.SubPubOnly
+}
+
+func NewWrapSubPubCollect() WrapSubPub {
+	return WrapSubPub{
+		Sub: sub.SubPubOnly{
+			A: 1,
+			B: 2,
+		},
+	}
+}
+
+func NewWrapSubPubEmpty() WrapSubPub {
+	return WrapSubPub{
+		Sub: sub.SubPubOnly{}, // want "fields 'A, B' are not initialized"
+	}
+}
+
+type WrapSubPriv struct {
+	Sub sub.SubPrivOnly
+}
+
+func NewWrapSubPrivCollect() WrapSubPriv {
+	return WrapSubPriv{
+		Sub: sub.SubPrivOnly{},
+	}
 }

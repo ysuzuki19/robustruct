@@ -48,7 +48,7 @@ func (si StructInit) IsUnnamed() bool {
 func (si StructInit) ListVisibleFields() (fields []*types.Var) {
 	for i := 0; i < si.TypeStruct.NumFields(); i++ {
 		field := si.TypeStruct.Field(i)
-		if field.Exported() {
+		if si.IsSamePackage() || field.Exported() {
 			fields = append(fields, field)
 		}
 	}
