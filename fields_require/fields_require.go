@@ -27,11 +27,8 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	structInits := struct_init.List(*pass)
 	for _, si := range structInits {
 		// Fast path: all fields are initialized
-		if si.TypeStruct.NumFields() == len(si.CompLit.Elts) {
-			continue
-		}
-
-		if si.IsIgnored("ignore:fields_require") {
+		if si.TypeStruct.NumFields() == len(si.CompLit.Elts) ||
+			si.IsIgnored("ignore:fields_require") {
 			continue
 		}
 
