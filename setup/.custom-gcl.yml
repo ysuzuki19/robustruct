@@ -1,0 +1,7 @@
+version: v1.61.0
+name: golangci-lint
+destination: bin
+plugins:
+  - module: "github.com/ysuzuki19/robustruct"
+    import: "github.com/ysuzuki19/robustruct/robustruct"
+    path: ".."
