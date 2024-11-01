@@ -2,6 +2,7 @@ package fields_require
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/format"
@@ -15,12 +16,15 @@ import (
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name: "fields_require",
-	Doc:  "checks that all fields of a struct are initialized in a composite literal",
-	Run:  run,
-	Requires: []*analysis.Analyzer{
-		inspect.Analyzer,
-	},
+	Name:             "fields_require",
+	Doc:              "checks that all fields of a struct are initialized in a composite literal",
+	URL:              "",
+	Flags:            flag.FlagSet{Usage: func() {}},
+	Run:              run,
+	RunDespiteErrors: false,
+	Requires:         []*analysis.Analyzer{inspect.Analyzer},
+	ResultType:       nil,
+	FactTypes:        []analysis.Fact{},
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
@@ -50,6 +54,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 			missingFields = append(missingFields, &ast.KeyValueExpr{
 				Key:   ast.NewIdent(field.Name()),
+				Colon: 0,
 				Value: generateDefaultExpr(field.Type(), si.IsSamePackage()),
 			})
 		}
@@ -76,21 +81,16 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			newText := buf.Bytes()
 
 			pass.Report(analysis.Diagnostic{
-				Pos:     si.CompLit.Pos(),
-				Message: fmt.Sprintf("fields '%s' are not initialized", fieldsCSV.String()),
-				// Message: "all fields are required for initializing", // to improve performance
-				SuggestedFixes: []analysis.SuggestedFix{
-					{
-						Message: "Add a missing fields",
-						TextEdits: []analysis.TextEdit{
-							{
-								Pos:     si.CompLit.Rbrace,
-								End:     si.CompLit.Rbrace,
-								NewText: newText,
-							},
-						},
-					},
-				},
+				Pos:      si.CompLit.Pos(),
+				End:      0,
+				Category: "",
+				Message:  fmt.Sprintf("fields '%s' are not initialized", fieldsCSV.String()),
+				URL:      "",
+				SuggestedFixes: []analysis.SuggestedFix{{
+					Message:   "Add a missing fields",
+					TextEdits: []analysis.TextEdit{{Pos: si.CompLit.Rbrace, End: si.CompLit.Rbrace, NewText: newText}},
+				}},
+				Related: []analysis.RelatedInformation{},
 			})
 		}
 	}
@@ -106,7 +106,11 @@ func generateDefaultExpr(typ types.Type, isSamePackage bool) ast.Expr {
 			types.Float32, types.Float64, types.Complex64, types.Complex128:
 			return ast.NewIdent("0")
 		case types.String:
-			return &ast.BasicLit{Kind: token.STRING, Value: `""`}
+			return &ast.BasicLit{
+				ValuePos: 0,
+				Kind:     token.STRING,
+				Value:    `""`,
+			}
 		case types.Bool:
 			return ast.NewIdent("false")
 		}

@@ -1,6 +1,8 @@
 package robustruct
 
 import (
+	"flag"
+
 	"golang.org/x/tools/go/analysis"
 
 	"github.com/ysuzuki19/robustruct/fields_align"
@@ -13,10 +15,15 @@ var analyzers = []*analysis.Analyzer{
 }
 
 var Analyzer = &analysis.Analyzer{
-	Name:     "robustruct",
-	Doc:      "robustruct is a suite of analyzers for struct literals",
-	Run:      run,
-	Requires: analyzers,
+	Name:             "robustruct",
+	Doc:              "robustruct is a suite of analyzers for struct literals",
+	URL:              "",
+	Flags:            flag.FlagSet{Usage: func() {}},
+	Run:              run,
+	RunDespiteErrors: false,
+	Requires:         analyzers,
+	ResultType:       nil,
+	FactTypes:        []analysis.Fact{},
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {

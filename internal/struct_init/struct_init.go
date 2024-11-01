@@ -96,9 +96,9 @@ func List(pass analysis.Pass) (found []StructInit) {
 
 			found = append(found, StructInit{
 				pass:       pass,
+				AstFile:    *file,
 				CompLit:    *compLit,
 				TypeStruct: *typeStruct,
-				AstFile:    *file,
 			})
 			return true
 		})
