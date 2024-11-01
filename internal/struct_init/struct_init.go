@@ -15,6 +15,8 @@ type StructInit struct {
 	TypeStruct types.Struct
 }
 
+const disableAllPattern = "ignore:robustruct"
+
 func (si StructInit) IsIgnored(pattern string) bool {
 	if si.pass.Fset == nil {
 		return false
@@ -24,7 +26,7 @@ func (si StructInit) IsIgnored(pattern string) bool {
 		commentPos := si.pass.Fset.Position(commentGroup.End())
 		if commentPos.Line+1 == structPos.Line {
 			for _, comment := range commentGroup.List {
-				if strings.Contains(comment.Text, "ignore:robustruct") ||
+				if strings.Contains(comment.Text, disableAllPattern) ||
 					strings.Contains(comment.Text, pattern) {
 					return true
 				}
@@ -32,6 +34,32 @@ func (si StructInit) IsIgnored(pattern string) bool {
 		}
 	}
 	return false
+}
+
+func (si StructInit) IsUnnamed() bool {
+	for _, elt := range si.CompLit.Elts {
+		if _, ok := elt.(*ast.KeyValueExpr); !ok {
+			return true
+		}
+	}
+	return false
+}
+
+func (si StructInit) ListVisibleFields() (fields []*types.Var) {
+	for i := 0; i < si.TypeStruct.NumFields(); i++ {
+		field := si.TypeStruct.Field(i)
+		if field.Exported() {
+			fields = append(fields, field)
+		}
+	}
+	return
+}
+
+func (si StructInit) IsSamePackage() bool {
+	if si.pass.Pkg == nil {
+		return false
+	}
+	return si.pass.Pkg.Path() == si.TypeStruct.Field(0).Pkg().Path()
 }
 
 func List(pass analysis.Pass) (found []StructInit) {
