@@ -60,3 +60,9 @@ func DefinedLackedUnaligned() SampleStruct {
 		Field2: "",
 	}
 }
+
+type EmptyStruct struct{}
+
+func NewEmptyStruct() EmptyStruct {
+	return EmptyStruct{}
+}
