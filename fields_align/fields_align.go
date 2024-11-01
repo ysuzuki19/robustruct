@@ -28,17 +28,18 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		// - if the number of fields of the struct is not equal to the number of initialized fields
 		// - if the number of fields of the struct is 0
 		if si.IsIgnored("ignore:fields_align") ||
-			// len(si.CompLit.Elts) != si.TypeStruct.NumFields() ||
 			si.TypeStruct.NumFields() == 0 {
 			continue
 		}
 
-		isUnnamed := false
+		if si.IsUnnamed() {
+			continue
+		}
+
 		isAligned := true
 		for i, elt := range si.CompLit.Elts {
 			kv, ok := elt.(*ast.KeyValueExpr)
 			if !ok || kv == nil {
-				isUnnamed = true
 				continue
 			}
 			field := si.TypeStruct.Field(i)
@@ -52,9 +53,6 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			if key.Name != field.Name() {
 				isAligned = false
 			}
-		}
-		if isUnnamed {
-			continue
 		}
 		if isAligned {
 			continue
