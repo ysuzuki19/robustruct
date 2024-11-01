@@ -23,4 +23,5 @@ jobs:
 
       - name: Run
         run: |
+          cd example
           ${HOME}/.local/bin/golangci-lint run
