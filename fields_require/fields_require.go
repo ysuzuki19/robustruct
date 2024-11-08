@@ -29,66 +29,9 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	structInits := struct_init.List(*pass)
-	for _, si := range structInits {
-		// Fast path: all fields are initialized
-		if si.TypeStruct.NumFields() == len(si.CompLit.Elts) ||
-			si.IsIgnored("ignore:fields_require") {
-			continue
-		}
-
-		initializedFields := make(map[string]bool)
-		for _, elt := range si.CompLit.Elts {
-			if kv, ok := elt.(*ast.KeyValueExpr); ok {
-				if ident, ok := kv.Key.(*ast.Ident); ok {
-					initializedFields[ident.Name] = true
-				} else {
-					continue
-				}
-			}
-		}
-
-		missingFields := field_init.NewFieldInits(pass, si.TypeStruct.NumFields()-len(si.CompLit.Elts))
-		for _, field := range si.ListVisibleFields() {
-			if initializedFields[field.Name()] {
-				continue
-			}
-			missingFields.PushExpr(field.Name(), generateDefaultExpr(field.Type(), si.IsSamePackage()))
-		}
-
-		if missingFields.Len() > 0 {
-			var fieldsCSV bytes.Buffer
-			_ = format.Node(&fieldsCSV, pass.Fset, missingFields.List()[0].Key())
-			for _, field := range missingFields.List()[1:] {
-				fieldsCSV.WriteString(", ")
-				_ = format.Node(&fieldsCSV, pass.Fset, field.Key())
-			}
-
-			newText, err := missingFields.ToBytes()
-			if err != nil {
-				return nil, err
-			}
-			if len(initializedFields) == 0 {
-				newText = append([]byte{'\n'}, newText...)
-			}
-
-			pass.Report(analysis.Diagnostic{
-				Pos:      si.CompLit.Pos(),
-				End:      0,
-				Category: "",
-				Message:  fmt.Sprintf("fields '%s' are not initialized", fieldsCSV.String()),
-				URL:      "",
-				SuggestedFixes: []analysis.SuggestedFix{{
-					Message: "Add a missing fields",
-					TextEdits: []analysis.TextEdit{{
-						Pos:     si.CompLit.Rbrace,
-						End:     si.CompLit.Rbrace,
-						NewText: newText,
-					}},
-				}},
-				Related: []analysis.RelatedInformation{},
-			})
-		}
+	handler := handlerFactory(pass)
+	if err := struct_init.List(*pass).ForEach(handler); err != nil {
+		return nil, err
 	}
 	return nil, nil
 }
@@ -121,4 +64,70 @@ func generateDefaultExpr(typ types.Type, isSamePackage bool) ast.Expr {
 		return ast.NewIdent(typ.String() + "{}")
 	}
 	return ast.NewIdent("nil")
+}
+
+func handlerFactory(pass *analysis.Pass) func(si struct_init.StructInit) error {
+	return func(si struct_init.StructInit) error {
+		// Fast path: all fields are initialized
+		if si.TypeStruct.NumFields() == len(si.CompLit.Elts) ||
+			si.IsIgnored("ignore:fields_require") {
+			return nil
+		}
+
+		initializedFields := make(map[string]bool)
+		for _, elt := range si.CompLit.Elts {
+			if kv, ok := elt.(*ast.KeyValueExpr); ok {
+				if ident, ok := kv.Key.(*ast.Ident); ok {
+					initializedFields[ident.Name] = true
+				} else {
+					continue
+				}
+			}
+		}
+
+		missingFields := field_init.NewFieldInits(pass, si.TypeStruct.NumFields()-len(si.CompLit.Elts))
+		for _, field := range si.ListVisibleFields() {
+			if initializedFields[field.Name()] {
+				continue
+			}
+			missingFields.PushExpr(field.Name(), generateDefaultExpr(field.Type(), si.IsSamePackage()))
+		}
+
+		if missingFields.Len() == 0 {
+			return nil
+		}
+
+		var fieldsCSV bytes.Buffer
+		_ = format.Node(&fieldsCSV, pass.Fset, missingFields.List()[0].Key())
+		for _, field := range missingFields.List()[1:] {
+			fieldsCSV.WriteString(", ")
+			_ = format.Node(&fieldsCSV, pass.Fset, field.Key())
+		}
+
+		newText, err := missingFields.ToBytes()
+		if err != nil {
+			return err
+		}
+		if len(initializedFields) == 0 {
+			newText = append([]byte{'\n'}, newText...)
+		}
+
+		pass.Report(analysis.Diagnostic{
+			Pos:      si.CompLit.Pos(),
+			End:      0,
+			Category: "",
+			Message:  fmt.Sprintf("fields '%s' are not initialized", fieldsCSV.String()),
+			URL:      "",
+			SuggestedFixes: []analysis.SuggestedFix{{
+				Message: "Add a missing fields",
+				TextEdits: []analysis.TextEdit{{
+					Pos:     si.CompLit.Rbrace,
+					End:     si.CompLit.Rbrace,
+					NewText: newText,
+				}},
+			}},
+			Related: []analysis.RelatedInformation{},
+		})
+		return nil
+	}
 }

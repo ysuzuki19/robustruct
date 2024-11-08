@@ -26,8 +26,15 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	structInits := struct_init.List(*pass)
-	for _, si := range structInits {
+	handler := handlerFactory(pass)
+	if err := struct_init.List(*pass).ForEach(handler); err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
+func handlerFactory(pass *analysis.Pass) func(si struct_init.StructInit) error {
+	return func(si struct_init.StructInit) error {
 		// Fast path:
 		// - if ignore comment exists
 		// - if struct has no fields
@@ -38,7 +45,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			si.IsUnnamed() ||
 			len(si.ListVisibleFields()) == 0 {
 			{
-				continue
+				return nil
 			}
 		}
 
@@ -49,23 +56,19 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 		{
 			isAligned := true
-			isFailed := false
 			cursor := -1
 			for _, elt := range si.CompLit.Elts {
 				kv, ok := elt.(*ast.KeyValueExpr)
 				if !ok || kv == nil {
-					isFailed = true
-					break
+					return nil
 				}
 				key, ok := kv.Key.(*ast.Ident)
 				if !ok || key == nil {
-					isFailed = true
-					break
+					return nil
 				}
 				keyCursor, ok := definedOrder[key.Name]
 				if !ok {
-					isFailed = true
-					break
+					return nil
 				}
 				if cursor < keyCursor {
 					cursor = keyCursor
@@ -74,8 +77,8 @@ func run(pass *analysis.Pass) (interface{}, error) {
 					break
 				}
 			}
-			if isAligned || isFailed {
-				continue
+			if isAligned {
+				return nil
 			}
 		}
 
@@ -102,7 +105,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 		newText, err := alignedFields.ToBytes()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		newText = append([]byte{'\n'}, newText...)
 
@@ -126,6 +129,6 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			},
 			Related: []analysis.RelatedInformation{},
 		})
+		return nil
 	}
-	return nil, nil
 }
