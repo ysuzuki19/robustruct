@@ -1,5 +1,7 @@
 package fix
 
+import "fix/sub"
+
 type SampleStruct struct {
 	Field1 int
 	Field2 string
@@ -19,6 +21,13 @@ func DefinedUnaligned() SampleStruct {
 		Field2: "hello",
 		Field1: 1,
 		Field3: true,
+	}
+}
+
+func NotEnoughNotAligned() SampleStruct {
+	return SampleStruct{ // want "all fields of the struct must be sorted by defined order"
+		Field3: true,
+		Field2: "hello",
 	}
 }
 
@@ -79,5 +88,33 @@ func AnythingTypesAligned() AnythingTypes {
 		Field13: new(*int),
 		Field14: new(**int),
 		Field15: [3]int{1, 2, 3},
+	}
+}
+
+func SubAligned() sub.SubSample {
+	return sub.SubSample{
+		A: 1,
+		C: 3,
+	}
+}
+
+func SubUnaligned() sub.SubSample {
+	return sub.SubSample{ // want "all fields of the struct must be sorted by defined order"
+		C: 3,
+		A: 1,
+	}
+}
+
+func SubNotEnoughAligned() sub.SubSample {
+	return sub.SubSample{
+		A: 1,
+		C: 3,
+	}
+}
+
+func SubNotEnoughUnaligned() sub.SubSample {
+	return sub.SubSample{ // want "all fields of the struct must be sorted by defined order"
+		C: 3,
+		A: 1,
 	}
 }

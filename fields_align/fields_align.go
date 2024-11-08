@@ -42,26 +42,41 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 		}
 
-		isAligned := true
-		for i, elt := range si.CompLit.Elts {
-			kv, ok := elt.(*ast.KeyValueExpr)
-			if !ok || kv == nil {
-				continue
-			}
-			field := si.TypeStruct.Field(i)
-			if field == nil {
-				continue
-			}
-			key, ok := kv.Key.(*ast.Ident)
-			if !ok || key == nil {
-				continue
-			}
-			if key.Name != field.Name() {
-				isAligned = false
-			}
+		definedOrder := map[string]int{}
+		for i, field := range si.ListVisibleFields() {
+			definedOrder[field.Name()] = i
 		}
-		if isAligned {
-			continue
+
+		{
+			isAligned := true
+			isFailed := false
+			cursor := -1
+			for _, elt := range si.CompLit.Elts {
+				kv, ok := elt.(*ast.KeyValueExpr)
+				if !ok || kv == nil {
+					isFailed = true
+					break
+				}
+				key, ok := kv.Key.(*ast.Ident)
+				if !ok || key == nil {
+					isFailed = true
+					break
+				}
+				keyCursor, ok := definedOrder[key.Name]
+				if !ok {
+					isFailed = true
+					break
+				}
+				if cursor < keyCursor {
+					cursor = keyCursor
+				} else {
+					isAligned = false
+					break
+				}
+			}
+			if isAligned || isFailed {
+				continue
+			}
 		}
 
 		kves := make(map[string]*ast.KeyValueExpr)
