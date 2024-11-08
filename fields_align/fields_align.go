@@ -26,109 +26,106 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	handler := handlerFactory(pass)
-	if err := struct_init.List(*pass).ForEach(handler); err != nil {
+	if err := struct_init.Inspect(pass, handler); err != nil {
 		return nil, err
 	}
 	return nil, nil
 }
 
-func handlerFactory(pass *analysis.Pass) func(si struct_init.StructInit) error {
-	return func(si struct_init.StructInit) error {
-		// Fast path:
-		// - if ignore comment exists
-		// - if struct has no fields
-		// - if struct definition is unnamed
-		// - if struct has no visible fields
-		if si.IsIgnored("ignore:fields_align") ||
-			si.TypeStruct.NumFields() == 0 ||
-			si.IsUnnamed() ||
-			len(si.ListVisibleFields()) == 0 {
-			{
-				return nil
-			}
-		}
-
-		definedOrder := map[string]int{}
-		for i, field := range si.ListVisibleFields() {
-			definedOrder[field.Name()] = i
-		}
-
+func handler(pass *analysis.Pass, si struct_init.StructInit) error {
+	// Fast path:
+	// - if ignore comment exists
+	// - if struct has no fields
+	// - if struct definition is unnamed
+	// - if struct has no visible fields
+	if si.IsIgnored("ignore:fields_align") ||
+		si.TypeStruct.NumFields() == 0 ||
+		si.IsUnnamed() ||
+		len(si.ListVisibleFields()) == 0 {
 		{
-			isAligned := true
-			cursor := -1
-			for _, elt := range si.CompLit.Elts {
-				kv, ok := elt.(*ast.KeyValueExpr)
-				if !ok || kv == nil {
-					return nil
-				}
-				key, ok := kv.Key.(*ast.Ident)
-				if !ok || key == nil {
-					return nil
-				}
-				keyCursor, ok := definedOrder[key.Name]
-				if !ok {
-					return nil
-				}
-				if cursor < keyCursor {
-					cursor = keyCursor
-				} else {
-					isAligned = false
-					break
-				}
-			}
-			if isAligned {
-				return nil
-			}
+			return nil
 		}
+	}
 
-		kves := make(map[string]*ast.KeyValueExpr)
+	definedOrder := map[string]int{}
+	for i, field := range si.ListVisibleFields() {
+		definedOrder[field.Name()] = i
+	}
+
+	{
+		isAligned := true
+		cursor := -1
 		for _, elt := range si.CompLit.Elts {
 			kv, ok := elt.(*ast.KeyValueExpr)
 			if !ok || kv == nil {
-				continue
+				return nil
 			}
-			ident, ok := kv.Key.(*ast.Ident)
-			if !ok || ident == nil {
-				continue
+			key, ok := kv.Key.(*ast.Ident)
+			if !ok || key == nil {
+				return nil
 			}
-			kves[ident.Name] = kv
-		}
-
-		alignedFields := field_init.NewFieldInits(pass, si.TypeStruct.NumFields())
-		for i := 0; i < si.TypeStruct.NumFields(); i++ {
-			field := si.TypeStruct.Field(i)
-			if kve, ok := kves[field.Name()]; ok {
-				alignedFields.PushKeyValueExpr(kve)
+			keyCursor, ok := definedOrder[key.Name]
+			if !ok {
+				return nil
+			}
+			if cursor < keyCursor {
+				cursor = keyCursor
+			} else {
+				isAligned = false
+				break
 			}
 		}
-
-		newText, err := alignedFields.ToBytes()
-		if err != nil {
-			return err
+		if isAligned {
+			return nil
 		}
-		newText = append([]byte{'\n'}, newText...)
+	}
 
-		pass.Report(analysis.Diagnostic{
-			Pos:      si.CompLit.Pos(),
-			End:      0,
-			Category: "",
-			Message:  "all fields of the struct must be sorted by defined order",
-			URL:      "",
-			SuggestedFixes: []analysis.SuggestedFix{
-				{
-					Message: "Align fields by defined order",
-					TextEdits: []analysis.TextEdit{
-						{
-							Pos:     si.CompLit.Lbrace + 1,
-							End:     si.CompLit.Rbrace,
-							NewText: newText,
-						},
+	kves := make(map[string]*ast.KeyValueExpr)
+	for _, elt := range si.CompLit.Elts {
+		kv, ok := elt.(*ast.KeyValueExpr)
+		if !ok || kv == nil {
+			continue
+		}
+		ident, ok := kv.Key.(*ast.Ident)
+		if !ok || ident == nil {
+			continue
+		}
+		kves[ident.Name] = kv
+	}
+
+	alignedFields := field_init.NewFieldInits(pass, si.TypeStruct.NumFields())
+	for i := 0; i < si.TypeStruct.NumFields(); i++ {
+		field := si.TypeStruct.Field(i)
+		if kve, ok := kves[field.Name()]; ok {
+			alignedFields.PushKeyValueExpr(kve)
+		}
+	}
+
+	newText, err := alignedFields.ToBytes()
+	if err != nil {
+		return err
+	}
+	newText = append([]byte{'\n'}, newText...)
+
+	pass.Report(analysis.Diagnostic{
+		Pos:      si.CompLit.Pos(),
+		End:      0,
+		Category: "",
+		Message:  "all fields of the struct must be sorted by defined order",
+		URL:      "",
+		SuggestedFixes: []analysis.SuggestedFix{
+			{
+				Message: "Align fields by defined order",
+				TextEdits: []analysis.TextEdit{
+					{
+						Pos:     si.CompLit.Lbrace + 1,
+						End:     si.CompLit.Rbrace,
+						NewText: newText,
 					},
 				},
 			},
-			Related: []analysis.RelatedInformation{},
-		})
-		return nil
-	}
+		},
+		Related: []analysis.RelatedInformation{},
+	})
+	return nil
 }

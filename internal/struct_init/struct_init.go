@@ -8,17 +8,6 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-type StructInits []StructInit
-
-func (sis StructInits) ForEach(f func(si StructInit) error) error {
-	for _, si := range sis {
-		if err := f(si); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 type StructInit struct {
 	pass       analysis.Pass
 	AstFile    ast.File
@@ -73,13 +62,14 @@ func (si StructInit) IsSamePackage() bool {
 	return si.pass.Pkg.Path() == si.TypeStruct.Field(0).Pkg().Path()
 }
 
-func List(pass analysis.Pass) (found StructInits) {
+func Inspect(pass *analysis.Pass, handler func(passs *analysis.Pass, si StructInit) error) error {
 	for _, file := range pass.Files {
 		if file == nil {
 			continue
 		}
+		var err error
 		ast.Inspect(file, func(n ast.Node) bool {
-			if n == nil {
+			if n == nil || err != nil {
 				return false
 			}
 			compLit, ok := n.(*ast.CompositeLit)
@@ -105,14 +95,17 @@ func List(pass analysis.Pass) (found StructInits) {
 				return true
 			}
 
-			found = append(found, StructInit{
-				pass:       pass,
+			err = handler(pass, StructInit{
+				pass:       *pass,
 				AstFile:    *file,
 				CompLit:    *compLit,
 				TypeStruct: *typeStruct,
 			})
 			return true
 		})
+		if err != nil {
+			return err
+		}
 	}
-	return
+	return nil
 }
