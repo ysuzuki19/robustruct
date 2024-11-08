@@ -98,9 +98,10 @@ func handlerFactory(pass *analysis.Pass) func(si struct_init.StructInit) error {
 		}
 
 		var fieldsCSV bytes.Buffer
-		_ = format.Node(&fieldsCSV, pass.Fset, missingFields.List()[0].Key())
-		for _, field := range missingFields.List()[1:] {
-			fieldsCSV.WriteString(", ")
+		for idx, field := range missingFields.List() {
+			if idx != 0 {
+				fieldsCSV.WriteString(", ")
+			}
 			_ = format.Node(&fieldsCSV, pass.Fset, field.Key())
 		}
 
