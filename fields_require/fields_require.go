@@ -1,17 +1,16 @@
 package fields_require
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"go/ast"
-	"go/format"
 	"go/token"
 	"go/types"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 
+	"github.com/ysuzuki19/robustruct/internal/chain_writer"
 	"github.com/ysuzuki19/robustruct/internal/field_init"
 	"github.com/ysuzuki19/robustruct/internal/struct_init"
 )
@@ -97,13 +96,14 @@ func handlerFactory(pass *analysis.Pass) func(si struct_init.StructInit) error {
 			return nil
 		}
 
-		var fieldsCSV bytes.Buffer
+		cw := chain_writer.New(pass)
 		for idx, field := range missingFields.List() {
 			if idx != 0 {
-				fieldsCSV.WriteString(", ")
+				cw.Push(", ")
 			}
-			_ = format.Node(&fieldsCSV, pass.Fset, field.Key())
+			cw.Push(field.Key())
 		}
+		fieldsCSV, _ := cw.String()
 
 		newText, err := missingFields.ToBytes()
 		if err != nil {
@@ -117,7 +117,7 @@ func handlerFactory(pass *analysis.Pass) func(si struct_init.StructInit) error {
 			Pos:      si.CompLit.Pos(),
 			End:      0,
 			Category: "",
-			Message:  fmt.Sprintf("fields '%s' are not initialized", fieldsCSV.String()),
+			Message:  fmt.Sprintf("fields '%s' are not initialized", fieldsCSV),
 			URL:      "",
 			SuggestedFixes: []analysis.SuggestedFix{{
 				Message: "Add a missing fields",

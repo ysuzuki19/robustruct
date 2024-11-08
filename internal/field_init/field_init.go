@@ -1,11 +1,11 @@
 package field_init
 
 import (
-	"bytes"
 	"go/ast"
-	"go/format"
 
 	"golang.org/x/tools/go/analysis"
+
+	"github.com/ysuzuki19/robustruct/internal/chain_writer"
 )
 
 type FieldInit struct {
@@ -14,10 +14,6 @@ type FieldInit struct {
 
 func (fi *FieldInit) Key() ast.Expr {
 	return fi.kve.Key
-}
-
-func (fi *FieldInit) Write(pass *analysis.Pass, buf *bytes.Buffer) error {
-	return format.Node(buf, pass.Fset, fi.kve)
 }
 
 type FieldInits struct {
@@ -41,15 +37,11 @@ func (fis *FieldInits) Len() int {
 }
 
 func (fis *FieldInits) ToBytes() ([]byte, error) {
-	var buf bytes.Buffer
+	cw := chain_writer.New(fis.pass)
 	for _, fi := range fis.list {
-		err := fi.Write(fis.pass, &buf)
-		if err != nil {
-			continue
-		}
-		buf.WriteString(",\n")
+		cw.Push(fi.kve).Push(",\n")
 	}
-	return buf.Bytes(), nil
+	return cw.Bytes()
 }
 
 func (fis *FieldInits) Push(i *FieldInit) {
