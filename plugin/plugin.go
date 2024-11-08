@@ -23,6 +23,9 @@ type PluginRobustruct struct {
 	analyzers []*analysis.Analyzer
 }
 
+// ignore:fields_require
+var _ register.LinterPlugin = &PluginRobustruct{}
+
 func New(input any) (register.LinterPlugin, error) {
 	settings, err := register.DecodeSettings[Settings](input)
 	if err != nil {
