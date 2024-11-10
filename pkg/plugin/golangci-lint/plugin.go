@@ -1,4 +1,4 @@
-package plugin
+package golangci_lint
 
 import (
 	"golang.org/x/tools/go/analysis"

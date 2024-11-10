@@ -1,5 +1,5 @@
 version: v1.61.0
 plugins:
   - module: "github.com/ysuzuki19/robustruct"
-    import: "github.com/ysuzuki19/robustruct/pkg/plugin"
+    import: "github.com/ysuzuki19/robustruct/pkg/plugin/golangci-lint"
     version: "latest"
