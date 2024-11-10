@@ -10,7 +10,7 @@ import (
 	"github.com/ysuzuki19/robustruct/pkg/robustruct/settings"
 )
 
-var analyzers = []*analysis.Analyzer{
+var FeatureAnalyzers = []*analysis.Analyzer{
 	fields_require.Analyzer,
 	fields_align.Analyzer,
 }
@@ -22,13 +22,13 @@ var Analyzer = &analysis.Analyzer{
 	Flags:            flag.FlagSet{Usage: func() {}},
 	Run:              run,
 	RunDespiteErrors: false,
-	Requires:         analyzers,
+	Requires:         FeatureAnalyzers,
 	ResultType:       nil,
 	FactTypes:        []analysis.Fact{},
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	for _, analyzer := range analyzers {
+	for _, analyzer := range FeatureAnalyzers {
 		if _, err := analyzer.Run(pass); err != nil {
 			return nil, err
 		}
@@ -38,9 +38,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 func Factory(settings settings.Settings) *analysis.Analyzer {
 	enabled := []*analysis.Analyzer{}
-	for _, a := range analyzers {
-		if settings.Features.Contains(a.Name) {
-			enabled = append(enabled, a)
+	for _, analyzer := range FeatureAnalyzers {
+		if settings.Features.Contains(analyzer.Name) {
+			enabled = append(enabled, analyzer)
 		}
 	}
 	run := func(pass *analysis.Pass) (interface{}, error) {

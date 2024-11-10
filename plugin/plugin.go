@@ -14,8 +14,7 @@ func init() {
 }
 
 type PluginRobustruct struct {
-	settings  settings.Settings
-	analyzers []*analysis.Analyzer
+	settings settings.Settings
 }
 
 // ignore:fields_require
@@ -27,14 +26,13 @@ func New(input any) (register.LinterPlugin, error) {
 		return nil, err
 	}
 	return &PluginRobustruct{
-		settings:  settings,
-		analyzers: robustruct.Analyzer.Requires,
+		settings: settings,
 	}, nil
 }
 
 func (pr *PluginRobustruct) BuildAnalyzers() ([]*analysis.Analyzer, error) {
 	analyzers := []*analysis.Analyzer{}
-	for _, analyzer := range pr.analyzers {
+	for _, analyzer := range robustruct.FeatureAnalyzers {
 		if pr.settings.Features.Contains(analyzer.Name) {
 			analyzers = append(analyzers, analyzer)
 		}
