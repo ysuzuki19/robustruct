@@ -1,25 +1,20 @@
 package plugin
 
 import (
-	"slices"
-
 	"golang.org/x/tools/go/analysis"
 
 	"github.com/golangci/plugin-module-register/register"
 
 	"github.com/ysuzuki19/robustruct/pkg/robustruct"
+	"github.com/ysuzuki19/robustruct/pkg/robustruct/settings"
 )
 
 func init() {
 	register.Plugin("robustruct", New)
 }
 
-type Settings struct {
-	Features []string `json:"features"`
-}
-
 type PluginRobustruct struct {
-	settings  Settings
+	settings  settings.Settings
 	analyzers []*analysis.Analyzer
 }
 
@@ -27,7 +22,7 @@ type PluginRobustruct struct {
 var _ register.LinterPlugin = &PluginRobustruct{}
 
 func New(input any) (register.LinterPlugin, error) {
-	settings, err := register.DecodeSettings[Settings](input)
+	settings, err := register.DecodeSettings[settings.Settings](input)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +35,7 @@ func New(input any) (register.LinterPlugin, error) {
 func (pr *PluginRobustruct) BuildAnalyzers() ([]*analysis.Analyzer, error) {
 	analyzers := []*analysis.Analyzer{}
 	for _, analyzer := range pr.analyzers {
-		if !slices.Contains(pr.settings.Features, analyzer.Name) {
+		if pr.settings.Features.Contains(analyzer.Name) {
 			analyzers = append(analyzers, analyzer)
 		}
 	}

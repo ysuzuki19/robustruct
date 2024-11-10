@@ -3,7 +3,9 @@ linters-settings:
     robustruct:
       type: "module"
       settings:
-        disables:
+        features:
+          - "fields_require"
+          - "fields_align"
 
 linters:
   enable:

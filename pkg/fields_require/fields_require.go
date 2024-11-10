@@ -11,10 +11,11 @@ import (
 	"github.com/ysuzuki19/robustruct/internal/chain_writer"
 	"github.com/ysuzuki19/robustruct/internal/field_inits"
 	"github.com/ysuzuki19/robustruct/internal/struct_init"
+	"github.com/ysuzuki19/robustruct/pkg/robustruct/settings"
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name:             "fields_require",
+	Name:             settings.FeatureFieldsRequire.String(),
 	Doc:              "checks that all fields of a struct are initialized in a composite literal",
 	URL:              "",
 	Flags:            flag.FlagSet{Usage: func() {}},

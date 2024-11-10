@@ -9,10 +9,11 @@ import (
 
 	"github.com/ysuzuki19/robustruct/internal/field_inits"
 	"github.com/ysuzuki19/robustruct/internal/struct_init"
+	"github.com/ysuzuki19/robustruct/pkg/robustruct/settings"
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name: "fields_align",
+	Name: settings.FeatureFieldsAlign.String(),
 	Doc:  "checks that all fields of a struct are sorted by defined order",
 	URL:  "",
 	Flags: flag.FlagSet{
