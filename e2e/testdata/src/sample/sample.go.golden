@@ -23,3 +23,20 @@ func Sample2() {
 	}
 	_ = s
 }
+
+func Sample3() {
+	// ignore:robustruct
+	s := Sample{
+		B: "hello",
+		A: 1,
+	}
+	_ = s
+}
+
+func Sample4() {
+	s := Sample{
+		A: 1,
+		B: "hello",
+	} // ignore:fields_require
+	_ = s
+}

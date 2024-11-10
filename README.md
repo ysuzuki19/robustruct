@@ -13,28 +13,6 @@ This tool is module plugin for `golangci-lint`.
   - Check all fields are aligned ordered by struct definition
   - Suggest to align fields
 
-# Disabling
-
-You can disable a check with a comment.
-
-ignore all features.
-
-```go
-// ignore:robustruct
-```
-
-ignore `fields_require`.
-
-```go
-// ignore:fields_require
-```
-
-ignore `fields_align`.
-
-```go
-// ignore:fields_align
-```
-
 # Sample
 
 for the following code, robustruct will suggest the following fixes.
@@ -97,5 +75,48 @@ func main() {
         B: "hello",
         AA: false,
     }
+}
+```
+
+# Ignore
+
+You can disable a check with a comment.
+
+ignore all features.
+
+```go
+// ignore:robustruct
+```
+
+ignore `fields_require`.
+
+```go
+// ignore:fields_require
+```
+
+ignore `fields_align`.
+
+```go
+// ignore:fields_align
+```
+
+## Sample
+
+```go
+func main() {
+    // ignore:robustruct
+    s := Sample{
+        B: "hello",
+        A: 1,
+    }
+}
+```
+
+```go
+func main() {
+	s := Sample{
+		A: 1,
+		B: "hello",
+	} // ignore:fields_require
 }
 ```
