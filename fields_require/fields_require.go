@@ -50,7 +50,7 @@ func handler(pass *analysis.Pass, si struct_init.StructInit) error {
 		}
 	}
 
-	missingFields := field_inits.NewFieldInits(pass, si.TypeStruct.NumFields()-len(si.CompLit.Elts))
+	missingFields := field_inits.New(pass, si.TypeStruct.NumFields()-len(si.CompLit.Elts))
 	for _, field := range si.VisibleFields() {
 		if initializedFields[field.Name()] {
 			continue

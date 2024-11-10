@@ -15,7 +15,7 @@ type FieldInits struct {
 	list []*field_init.FieldInit
 }
 
-func NewFieldInits(pass *analysis.Pass, cap int) FieldInits {
+func New(pass *analysis.Pass, cap int) FieldInits {
 	return FieldInits{
 		pass: pass,
 		list: make([]*field_init.FieldInit, 0, cap),

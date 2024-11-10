@@ -93,7 +93,7 @@ func handler(pass *analysis.Pass, si struct_init.StructInit) error {
 		kves[ident.Name] = kv
 	}
 
-	alignedFields := field_inits.NewFieldInits(pass, si.TypeStruct.NumFields())
+	alignedFields := field_inits.New(pass, si.TypeStruct.NumFields())
 	for i := 0; i < si.TypeStruct.NumFields(); i++ {
 		field := si.TypeStruct.Field(i)
 		if kve, ok := kves[field.Name()]; ok {
