@@ -41,14 +41,14 @@ func handler(pass *analysis.Pass, si struct_init.StructInit) error {
 	if si.IsIgnored("ignore:fields_align") ||
 		si.TypeStruct.NumFields() == 0 ||
 		si.IsUnnamed() ||
-		len(si.ListVisibleFields()) == 0 {
+		len(si.VisibleFields()) == 0 {
 		{
 			return nil
 		}
 	}
 
 	definedOrder := map[string]int{}
-	for i, field := range si.ListVisibleFields() {
+	for i, field := range si.VisibleFields() {
 		definedOrder[field.Name()] = i
 	}
 
