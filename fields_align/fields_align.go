@@ -7,7 +7,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 
-	"github.com/ysuzuki19/robustruct/internal/field_init"
+	"github.com/ysuzuki19/robustruct/internal/field_inits"
 	"github.com/ysuzuki19/robustruct/internal/struct_init"
 )
 
@@ -93,7 +93,7 @@ func handler(pass *analysis.Pass, si struct_init.StructInit) error {
 		kves[ident.Name] = kv
 	}
 
-	alignedFields := field_init.NewFieldInits(pass, si.TypeStruct.NumFields())
+	alignedFields := field_inits.NewFieldInits(pass, si.TypeStruct.NumFields())
 	for i := 0; i < si.TypeStruct.NumFields(); i++ {
 		field := si.TypeStruct.Field(i)
 		if kve, ok := kves[field.Name()]; ok {

@@ -2,62 +2,62 @@ package field_init
 
 import (
 	"go/ast"
-
-	"golang.org/x/tools/go/analysis"
-
-	"github.com/ysuzuki19/robustruct/internal/chain_writer"
+	"go/token"
+	"go/types"
 )
 
 type FieldInit struct {
 	kve *ast.KeyValueExpr
 }
 
+func (fi *FieldInit) KeyValueExpr() *ast.KeyValueExpr {
+	return fi.kve
+}
+
 func (fi *FieldInit) Key() ast.Expr {
 	return fi.kve.Key
 }
 
-type FieldInits struct {
-	pass *analysis.Pass
-	list []*FieldInit
+func FromKeyValueExpr(kve *ast.KeyValueExpr) *FieldInit {
+	return &FieldInit{kve}
 }
 
-func NewFieldInits(pass *analysis.Pass, cap int) FieldInits {
-	return FieldInits{
-		pass: pass,
-		list: make([]*FieldInit, 0, cap),
-	}
-}
-
-func (fis *FieldInits) List() []*FieldInit {
-	return fis.list
-}
-
-func (fis *FieldInits) Len() int {
-	return len(fis.list)
-}
-
-func (fis *FieldInits) ToBytes() ([]byte, error) {
-	cw := chain_writer.New(fis.pass)
-	for _, fi := range fis.list {
-		cw.Push(fi.kve).Push(",\n")
-	}
-	return cw.Bytes()
-}
-
-func (fis *FieldInits) Push(i *FieldInit) {
-	fis.list = append(fis.list, i)
-}
-
-func (fis *FieldInits) PushKeyValueExpr(kve *ast.KeyValueExpr) {
-	fis.Push(&FieldInit{kve})
-}
-
-func (fis *FieldInits) PushExpr(key string, value ast.Expr) {
-	fis.Push(&FieldInit{
+func FromVarDefault(field *types.Var, isSamePackage bool) *FieldInit {
+	return &FieldInit{
 		&ast.KeyValueExpr{
-			Key:   ast.NewIdent(key),
+			Key:   ast.NewIdent(field.Name()),
 			Colon: 0,
-			Value: value,
+			Value: generateDefaultExpr(field.Type(), isSamePackage),
 		},
-	})
+	}
+}
+
+func generateDefaultExpr(typ types.Type, isSamePackage bool) ast.Expr {
+	switch t := typ.Underlying().(type) {
+	case *types.Basic:
+		switch t.Kind() {
+		case types.Int, types.Int8, types.Int16, types.Int32, types.Int64,
+			types.Uint, types.Uint8, types.Uint16, types.Uint32, types.Uint64,
+			types.Float32, types.Float64, types.Complex64, types.Complex128:
+			return ast.NewIdent("0")
+		case types.String:
+			return &ast.BasicLit{
+				ValuePos: 0,
+				Kind:     token.STRING,
+				Value:    `""`,
+			}
+		case types.Bool:
+			return ast.NewIdent("false")
+		}
+	}
+	if isSamePackage {
+		if named, ok := typ.(*types.Named); ok {
+			// return without package
+			return ast.NewIdent(named.Obj().Name() + "{}")
+		}
+	} else {
+		// return with package
+		return ast.NewIdent(typ.String() + "{}")
+	}
+	return ast.NewIdent("nil")
 }

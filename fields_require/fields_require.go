@@ -4,14 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"go/ast"
-	"go/token"
-	"go/types"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 
 	"github.com/ysuzuki19/robustruct/internal/chain_writer"
-	"github.com/ysuzuki19/robustruct/internal/field_init"
+	"github.com/ysuzuki19/robustruct/internal/field_inits"
 	"github.com/ysuzuki19/robustruct/internal/struct_init"
 )
 
@@ -34,36 +32,6 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	return nil, nil
 }
 
-func generateDefaultExpr(typ types.Type, isSamePackage bool) ast.Expr {
-	switch t := typ.Underlying().(type) {
-	case *types.Basic:
-		switch t.Kind() {
-		case types.Int, types.Int8, types.Int16, types.Int32, types.Int64,
-			types.Uint, types.Uint8, types.Uint16, types.Uint32, types.Uint64,
-			types.Float32, types.Float64, types.Complex64, types.Complex128:
-			return ast.NewIdent("0")
-		case types.String:
-			return &ast.BasicLit{
-				ValuePos: 0,
-				Kind:     token.STRING,
-				Value:    `""`,
-			}
-		case types.Bool:
-			return ast.NewIdent("false")
-		}
-	}
-	if isSamePackage {
-		if named, ok := typ.(*types.Named); ok {
-			// return without package
-			return ast.NewIdent(named.Obj().Name() + "{}")
-		}
-	} else {
-		// return with package
-		return ast.NewIdent(typ.String() + "{}")
-	}
-	return ast.NewIdent("nil")
-}
-
 func handler(pass *analysis.Pass, si struct_init.StructInit) error {
 	// Fast path: all fields are initialized
 	if si.TypeStruct.NumFields() == len(si.CompLit.Elts) ||
@@ -82,12 +50,12 @@ func handler(pass *analysis.Pass, si struct_init.StructInit) error {
 		}
 	}
 
-	missingFields := field_init.NewFieldInits(pass, si.TypeStruct.NumFields()-len(si.CompLit.Elts))
+	missingFields := field_inits.NewFieldInits(pass, si.TypeStruct.NumFields()-len(si.CompLit.Elts))
 	for _, field := range si.VisibleFields() {
 		if initializedFields[field.Name()] {
 			continue
 		}
-		missingFields.PushExpr(field.Name(), generateDefaultExpr(field.Type(), si.IsSamePackage()))
+		missingFields.PushVarDefault(field, si.IsSamePackage())
 	}
 
 	if missingFields.Len() == 0 {
