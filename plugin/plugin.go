@@ -7,7 +7,7 @@ import (
 
 	"github.com/golangci/plugin-module-register/register"
 
-	"github.com/ysuzuki19/robustruct"
+	"github.com/ysuzuki19/robustruct/pkg/robustruct"
 )
 
 func init() {
@@ -15,7 +15,7 @@ func init() {
 }
 
 type Settings struct {
-	Disables []string `json:"disables"`
+	Features []string `json:"features"`
 }
 
 type PluginRobustruct struct {
@@ -40,7 +40,7 @@ func New(input any) (register.LinterPlugin, error) {
 func (pr *PluginRobustruct) BuildAnalyzers() ([]*analysis.Analyzer, error) {
 	analyzers := []*analysis.Analyzer{}
 	for _, analyzer := range pr.analyzers {
-		if !slices.Contains(pr.settings.Disables, analyzer.Name) {
+		if !slices.Contains(pr.settings.Features, analyzer.Name) {
 			analyzers = append(analyzers, analyzer)
 		}
 	}

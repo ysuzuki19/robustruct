@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/tools/go/analysis"
 
-	"github.com/ysuzuki19/robustruct/fields_align"
-	"github.com/ysuzuki19/robustruct/fields_require"
+	"github.com/ysuzuki19/robustruct/pkg/fields_align"
+	"github.com/ysuzuki19/robustruct/pkg/fields_require"
 )
 
 var analyzers = []*analysis.Analyzer{

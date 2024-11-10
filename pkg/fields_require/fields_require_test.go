@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/tools/go/analysis/analysistest"
 
-	"github.com/ysuzuki19/robustruct/fields_require"
+	"github.com/ysuzuki19/robustruct/pkg/fields_require"
 )
 
 func TestFix(t *testing.T) {
