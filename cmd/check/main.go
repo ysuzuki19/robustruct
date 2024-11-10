@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	multichecker.Main(robustruct.Analyzer)
+	multichecker.Main(robustruct.FeatureAnalyzers...)
 }
