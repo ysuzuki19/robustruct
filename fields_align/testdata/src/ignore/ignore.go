@@ -22,3 +22,11 @@ func Ignored() SampleStruct {
 		Field3: true,
 	}
 }
+
+func IgnoredEndOfStruct() SampleStruct {
+	return SampleStruct{
+		Field2: "hello",
+		Field1: 1,
+		Field3: true,
+	} // ignore:fields_align
+}

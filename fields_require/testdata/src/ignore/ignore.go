@@ -35,3 +35,10 @@ func Defined13() SampleStruct {
 		Field3: true,
 	}
 }
+
+func Defined13Ignored() SampleStruct {
+	return SampleStruct{
+		Field1: 1,
+		Field3: true,
+	} // ignore:fields_require
+}

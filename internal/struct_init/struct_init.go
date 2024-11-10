@@ -21,10 +21,11 @@ func (si StructInit) IsIgnored(pattern string) bool {
 	if si.pass.Fset == nil {
 		return false
 	}
-	structPos := si.pass.Fset.Position(si.CompLit.Pos())
+	structPos := si.pass.Fset.Position(si.CompLit.Pos()).Line
+	structEnd := si.pass.Fset.Position(si.CompLit.End()).Line
 	for _, commentGroup := range si.AstFile.Comments {
-		commentPos := si.pass.Fset.Position(commentGroup.End())
-		if commentPos.Line+1 == structPos.Line {
+		commentLine := si.pass.Fset.Position(commentGroup.End()).Line
+		if commentLine+1 == structPos || commentLine == structEnd {
 			for _, comment := range commentGroup.List {
 				if strings.Contains(comment.Text, disableAllPattern) ||
 					strings.Contains(comment.Text, pattern) {
