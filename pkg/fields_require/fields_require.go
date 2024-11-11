@@ -27,7 +27,11 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	if err := struct_init.Inspect(pass, handler); err != nil {
+	if err := struct_init.Inspect(struct_init.InspectInput{
+		Pass:        pass,
+		DisableTest: false,
+		Handler:     handler,
+	}); err != nil {
 		return nil, err
 	}
 	return nil, nil
@@ -97,4 +101,28 @@ func handler(pass *analysis.Pass, si struct_init.StructInit) error {
 		Related: []analysis.RelatedInformation{},
 	})
 	return nil
+}
+
+func Factory(flags settings.Flags) *analysis.Analyzer {
+	run := func(pass *analysis.Pass) (interface{}, error) {
+		if err := struct_init.Inspect(struct_init.InspectInput{
+			Pass:        pass,
+			DisableTest: flags.DisableTest(),
+			Handler:     handler,
+		}); err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	return &analysis.Analyzer{
+		Name:             Analyzer.Name,
+		Doc:              Analyzer.Doc,
+		URL:              Analyzer.URL,
+		Flags:            flag.FlagSet{Usage: func() {}},
+		Run:              run,
+		RunDespiteErrors: false,
+		Requires:         []*analysis.Analyzer{inspect.Analyzer},
+		ResultType:       nil,
+		FactTypes:        []analysis.Fact{},
+	}
 }

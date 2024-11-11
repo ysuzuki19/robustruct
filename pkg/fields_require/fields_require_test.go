@@ -6,6 +6,7 @@ import (
 	"golang.org/x/tools/go/analysis/analysistest"
 
 	"github.com/ysuzuki19/robustruct/pkg/fields_require"
+	"github.com/ysuzuki19/robustruct/pkg/robustruct/settings"
 )
 
 func TestFix(t *testing.T) {
@@ -15,7 +16,7 @@ func TestFix(t *testing.T) {
 
 func TestIgnore(t *testing.T) {
 	testdata := analysistest.TestData()
-	analysistest.RunWithSuggestedFixes(t, testdata, fields_require.Analyzer, "ignore")
+	analysistest.RunWithSuggestedFixes(t, testdata, fields_require.Factory(settings.Flags{settings.FlagDisableTest}), "ignore")
 }
 
 func TestExternal(t *testing.T) {

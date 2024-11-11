@@ -63,9 +63,18 @@ func (si StructInit) IsSamePackage() bool {
 	return si.pass.Pkg.Path() == si.TypeStruct.Field(0).Pkg().Path()
 }
 
-func Inspect(pass *analysis.Pass, handler func(passs *analysis.Pass, si StructInit) error) error {
-	for _, file := range pass.Files {
+type InspectInput struct {
+	Pass        *analysis.Pass
+	DisableTest bool
+	Handler     func(passs *analysis.Pass, si StructInit) error
+}
+
+func Inspect(input InspectInput) error {
+	for _, file := range input.Pass.Files {
 		if file == nil {
+			continue
+		}
+		if input.DisableTest && strings.HasSuffix(input.Pass.Fset.File(file.Pos()).Name(), "_test.go") {
 			continue
 		}
 		var err error
@@ -78,10 +87,10 @@ func Inspect(pass *analysis.Pass, handler func(passs *analysis.Pass, si StructIn
 				return true
 			}
 
-			if pass.TypesInfo == nil {
+			if input.Pass.TypesInfo == nil {
 				return true
 			}
-			typ := pass.TypesInfo.TypeOf(compLit)
+			typ := input.Pass.TypesInfo.TypeOf(compLit)
 			if typ == nil {
 				return true
 			}
@@ -96,8 +105,8 @@ func Inspect(pass *analysis.Pass, handler func(passs *analysis.Pass, si StructIn
 				return true
 			}
 
-			err = handler(pass, StructInit{
-				pass:       *pass,
+			err = input.Handler(input.Pass, StructInit{
+				pass:       *input.Pass,
 				AstFile:    *file,
 				CompLit:    *compLit,
 				TypeStruct: *typeStruct,

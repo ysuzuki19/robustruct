@@ -4,8 +4,10 @@ linters-settings:
       type: "module"
       settings:
         features:
-          - "fields_require"
-          - "fields_align"
+          - fields_require
+          - fields_align
+        flags:
+          - disable_test
 
 linters:
   enable:

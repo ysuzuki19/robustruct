@@ -5,7 +5,8 @@ import (
 
 	"github.com/golangci/plugin-module-register/register"
 
-	"github.com/ysuzuki19/robustruct/pkg/robustruct"
+	"github.com/ysuzuki19/robustruct/pkg/fields_align"
+	"github.com/ysuzuki19/robustruct/pkg/fields_require"
 	"github.com/ysuzuki19/robustruct/pkg/robustruct/settings"
 )
 
@@ -32,9 +33,12 @@ func New(input any) (register.LinterPlugin, error) {
 
 func (pr *PluginRobustruct) BuildAnalyzers() ([]*analysis.Analyzer, error) {
 	analyzers := []*analysis.Analyzer{}
-	for _, analyzer := range robustruct.FeatureAnalyzers {
-		if pr.settings.Features.Contains(analyzer.Name) {
-			analyzers = append(analyzers, analyzer)
+	for _, feature := range pr.settings.Features {
+		switch feature {
+		case settings.FeatureFieldsRequire:
+			analyzers = append(analyzers, fields_require.Factory(pr.settings.Flags))
+		case settings.FeatureFieldsAlign:
+			analyzers = append(analyzers, fields_align.Factory(pr.settings.Flags))
 		}
 	}
 	return analyzers, nil
