@@ -20,12 +20,12 @@ func None[T any]() Option[T] {
 	return Option[T]{ptr: nil}
 }
 
-func (e Option[T]) IsSome() bool {
-	return e.ptr != nil
+func (o Option[T]) IsSome() bool {
+	return o.ptr != nil
 }
 
-func (e Option[T]) IsNone() bool {
-	return e.ptr == nil
+func (o Option[T]) IsNone() bool {
+	return o.ptr == nil
 }
 
 func (o Option[T]) Ptr() *T {
