@@ -1,4 +1,4 @@
-package process
+package tmpl
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ func capitalize(s string) string {
 	return strings.ToUpper(s[:1]) + s[1:]
 }
 
-func bracket(s string) string {
+func Bracket(s string) string {
 	if s == "" {
 		return ""
 	}

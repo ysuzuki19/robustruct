@@ -1,12 +1,11 @@
 package process
 
 import (
-	"bytes"
 	"embed"
 	"fmt"
-	"html/template"
-	"log"
 	"strings"
+
+	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/internal/process/tmpl"
 )
 
 const fileName = "templates/senum.go.tmpl"
@@ -50,29 +49,26 @@ func Generate(args GenerateArgs) ([]byte, error) {
 		Name:          args.Name,
 		DefTypeParams: defTypeParams,
 		UseTypeParams: useTypeParams,
-		EnumDefName:   fmt.Sprintf("%sEnum%s", strings.ToLower(args.Name), bracket(defTypeParams)),
-		EnumUseName:   fmt.Sprintf("%sEnum%s", strings.ToLower(args.Name), bracket(useTypeParams)),
+		EnumDefName:   fmt.Sprintf("%sEnum%s", strings.ToLower(args.Name), tmpl.Bracket(defTypeParams)),
+		EnumUseName:   fmt.Sprintf("%sEnum%s", strings.ToLower(args.Name), tmpl.Bracket(useTypeParams)),
 		Variants:      args.AnalyzeResult.Variants,
 	}
 
-	tmplBytes, err := structEnumTemplateFS.ReadFile(fileName)
+	tc := tmpl.NewTemplateCollector()
+
+	tc.Merge(tmpl.Header, templateData).
+		Merge(tmpl.Tag, templateData).
+		Merge(tmpl.Enum, templateData).
+		Merge(tmpl.New, templateData).
+		Merge(tmpl.Is, templateData).
+		Merge(tmpl.As, templateData).
+		Merge(tmpl.Switch, templateData).
+		Merge(tmpl.Match, templateData)
+
+	generated, err := tc.Export()
 	if err != nil {
-		log.Fatal(err)
-	}
-	tmpl, err := template.New(fileName).Funcs(template.FuncMap{
-		"capitalize": capitalize,
-		"bracket":    bracket,
-		"csvConnect": csvConnect,
-	}).Parse(string(tmplBytes))
-	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	var buf bytes.Buffer
-
-	if err := tmpl.Execute(&buf, templateData); err != nil {
-		log.Fatal(err)
-	}
-
-	return buf.Bytes(), nil
+	return generated, nil
 }

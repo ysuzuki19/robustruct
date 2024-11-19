@@ -2,7 +2,7 @@
 package command
 
 import (
-	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/command/sub"
+	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/internal/sample/command/sub"
 	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/types"
 )
 
@@ -52,17 +52,25 @@ func NewLocal(v *Local) commandEnum {
 		tag: tagLocal,
 	}
 }
+
 func (e *commandEnum) IsHelp() bool {
 	return e.tag == tagHelp
 }
+func (e *commandEnum) IsRun() bool {
+	return e.tag == tagRun
+}
+func (e *commandEnum) IsSub() bool {
+	return e.tag == tagSub
+}
+func (e *commandEnum) IsLocal() bool {
+	return e.tag == tagLocal
+}
+
 func (e *commandEnum) AsHelp() (types.NonVar, bool) {
 	if e.IsHelp() {
 		return e.command.help, true
 	}
 	return nil, false
-}
-func (e *commandEnum) IsRun() bool {
-	return e.tag == tagRun
 }
 func (e *commandEnum) AsRun() (*string, bool) {
 	if e.IsRun() {
@@ -70,17 +78,11 @@ func (e *commandEnum) AsRun() (*string, bool) {
 	}
 	return nil, false
 }
-func (e *commandEnum) IsSub() bool {
-	return e.tag == tagSub
-}
 func (e *commandEnum) AsSub() (*sub.SubCommand, bool) {
 	if e.IsSub() {
 		return e.command.sub, true
 	}
 	return nil, false
-}
-func (e *commandEnum) IsLocal() bool {
-	return e.tag == tagLocal
 }
 func (e *commandEnum) AsLocal() (*Local, bool) {
 	if e.IsLocal() {
