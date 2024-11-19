@@ -2,11 +2,17 @@ package process
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"html/template"
 	"log"
 	"strings"
 )
+
+const fileName = "templates/senum.go.tmpl"
+
+//go:embed templates/senum.go.tmpl
+var structEnumTemplateFS embed.FS
 
 type TemplateData struct {
 	Package       string
