@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/command/sub"
+	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/internal/sample/command/sub"
 	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/types"
 )
 

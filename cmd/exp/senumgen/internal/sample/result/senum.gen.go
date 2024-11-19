@@ -29,17 +29,19 @@ func NewErr[T any](v error) resultEnum[T] {
 		tag: tagErr,
 	}
 }
+
 func (e *resultEnum[T]) IsOk() bool {
 	return e.tag == tagOk
 }
+func (e *resultEnum[T]) IsErr() bool {
+	return e.tag == tagErr
+}
+
 func (e *resultEnum[T]) AsOk() (*T, bool) {
 	if e.IsOk() {
 		return e.result.ok, true
 	}
 	return nil, false
-}
-func (e *resultEnum[T]) IsErr() bool {
-	return e.tag == tagErr
 }
 func (e *resultEnum[T]) AsErr() (error, bool) {
 	if e.IsErr() {
