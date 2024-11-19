@@ -3,12 +3,9 @@ package process
 import (
 	"bytes"
 	"fmt"
-	"go/format"
 	"html/template"
 	"log"
 	"strings"
-
-	"golang.org/x/tools/imports"
 )
 
 type TemplateData struct {
@@ -73,23 +70,4 @@ func Generate(args GenerateArgs) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
-}
-
-type PostGenerateArgs struct {
-	OutputFilePath string
-	Buf            []byte
-}
-
-func PostGenerate(args PostGenerateArgs) ([]byte, error) {
-	formattedCode, err := format.Source(args.Buf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	output, err := imports.Process(args.OutputFilePath, formattedCode, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return output, nil
 }
