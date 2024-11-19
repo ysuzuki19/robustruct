@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/internal"
+	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/internal/process"
 )
 
 func main() {
@@ -20,10 +20,10 @@ func main() {
 		dirPath = &wd
 	}
 
-	internal.Process(internal.Args{
+	process.Process(process.Args{
 		DirPath: *dirPath,
-		Writer: &internal.FileWriter{
-			FilePath: internal.OutputFilePath(*dirPath),
+		Writer: &process.FileWriter{
+			FilePath: process.OutputFilePath(*dirPath),
 		},
 	})
 }
