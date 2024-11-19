@@ -1,14 +1,5 @@
 package process
 
-import (
-	"embed"
-)
-
-const fileName = "templates/senum.go.tmpl"
-
-//go:embed templates/senum.go.tmpl
-var structEnumTemplateFS embed.FS
-
 type Args struct {
 	DirPath string
 	Writer  Write
