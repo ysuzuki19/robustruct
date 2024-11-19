@@ -29,8 +29,6 @@ func Process(args Args) {
 		log.Fatal(err)
 	}
 
-	name := targetDefinition.Name
-
 	analyzeResult, err := Analyze(targetDefinition)
 	if err != nil {
 		log.Fatal(err)
@@ -38,7 +36,7 @@ func Process(args Args) {
 
 	generated, err := Generate(GenerateArgs{
 		DirPath:       args.DirPath,
-		Name:          name,
+		Name:          targetDefinition.Name,
 		AnalyzeResult: analyzeResult,
 	})
 	if err != nil {
