@@ -2,7 +2,6 @@ package process
 
 import (
 	"embed"
-	"log"
 )
 
 const fileName = "templates/senum.go.tmpl"
@@ -23,15 +22,15 @@ type Args struct {
  * 4. Format and resolve imports the generated code.
  * 5. Write the generated code to the output file.
  */
-func Process(args Args) {
+func Process(args Args) error {
 	targetDefinition, err := FindTargetDefinition(args.DirPath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	analyzeResult, err := Analyze(targetDefinition)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	generated, err := Generate(GenerateArgs{
@@ -40,7 +39,7 @@ func Process(args Args) {
 		AnalyzeResult: analyzeResult,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	output, err := PostGenerate(PostGenerateArgs{
@@ -48,10 +47,12 @@ func Process(args Args) {
 		Buf:            generated,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if err := args.Writer.Write(output); err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
