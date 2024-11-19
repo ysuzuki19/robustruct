@@ -1,17 +1,11 @@
 package process
 
 import (
-	"embed"
 	"fmt"
 	"strings"
 
 	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/internal/process/tmpl"
 )
-
-const fileName = "templates/senum.go.tmpl"
-
-//go:embed templates/senum.go.tmpl
-var structEnumTemplateFS embed.FS
 
 type GenerateArgs struct {
 	DirPath       string
