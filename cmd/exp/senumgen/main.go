@@ -20,10 +20,12 @@ func main() {
 		dirPath = &wd
 	}
 
-	process.Process(process.Args{
+	if err := process.Process(process.Args{
 		DirPath: *dirPath,
 		Writer: &process.FileWriter{
 			FilePath: process.OutputFilePath(*dirPath),
 		},
-	})
+	}); err != nil {
+		log.Fatal(err)
+	}
 }
