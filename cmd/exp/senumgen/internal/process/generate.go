@@ -14,16 +14,6 @@ const fileName = "templates/senum.go.tmpl"
 //go:embed templates/senum.go.tmpl
 var structEnumTemplateFS embed.FS
 
-type TemplateData struct {
-	Package       string
-	Name          string
-	DefTypeParams string
-	UseTypeParams string
-	EnumDefName   string
-	EnumUseName   string
-	Variants      []Variant
-}
-
 type GenerateArgs struct {
 	DirPath       string
 	Name          string
@@ -46,7 +36,16 @@ func Generate(args GenerateArgs) ([]byte, error) {
 		}
 		useTypeParams += tp.Name
 	}
-	templateData := TemplateData{
+
+	templateData := struct {
+		Package       string
+		Name          string
+		DefTypeParams string
+		UseTypeParams string
+		EnumDefName   string
+		EnumUseName   string
+		Variants      []Variant
+	}{
 		Package:       args.Name,
 		Name:          args.Name,
 		DefTypeParams: defTypeParams,
