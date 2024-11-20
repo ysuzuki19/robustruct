@@ -5,20 +5,20 @@ import (
 	"text/template"
 )
 
-type TemplateCollector struct {
+type CodeCollector struct {
 	buf bytes.Buffer
 	err error
 }
 
-func NewTemplateCollector() *TemplateCollector {
+func NewCodeCollector() *CodeCollector {
 	var buf bytes.Buffer
-	return &TemplateCollector{
+	return &CodeCollector{
 		buf: buf,
 		err: nil,
 	}
 }
 
-func (tc *TemplateCollector) Merge(tmpl string, args interface{}) *TemplateCollector {
+func (tc *CodeCollector) Merge(tmpl string, args interface{}) *CodeCollector {
 	if tc.err != nil {
 		return tc
 	}
@@ -41,7 +41,7 @@ func (tc *TemplateCollector) Merge(tmpl string, args interface{}) *TemplateColle
 	return tc
 }
 
-func (tc *TemplateCollector) Export() ([]byte, error) {
+func (tc *CodeCollector) Export() ([]byte, error) {
 	if tc.err != nil {
 		return nil, tc.err
 	}
