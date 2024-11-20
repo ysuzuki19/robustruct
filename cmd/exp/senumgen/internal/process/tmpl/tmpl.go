@@ -89,6 +89,7 @@ func (e *{{ $.EnumUseName }}) Is{{ $variant.Name | capitalize }}() bool {
 }
 {{- end }}
 `
+
 const As = `
 {{- range $variant := .Variants }}
 {{- if $variant.HasData }}
@@ -101,6 +102,7 @@ func (e *{{ $.EnumUseName }}) As{{ $variant.Name | capitalize }}() ({{ $variant.
 {{- end }}
 {{- end }}
 `
+
 const Switch = `
 type Switcher{{.DefTypeParams | bracket}} struct {
 {{- range $variant := .Variants }}
@@ -121,6 +123,7 @@ func (e *{{ $.EnumUseName }}) Switch(s Switcher{{.UseTypeParams | bracket}}) {
     }
 }
 `
+
 const Match = `
 type Matcher[MatchResult any {{.DefTypeParams | csvConnect}}] struct {
 {{- range $variant := .Variants }}
