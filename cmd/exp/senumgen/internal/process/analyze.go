@@ -17,8 +17,18 @@ type TypeParam struct {
 	TypeName string
 }
 
+type TypeParams []TypeParam
+
+func (tps TypeParams) Map(f func(TypeParam) string) []string {
+	result := make([]string, 0, len(tps))
+	for _, tp := range tps {
+		result = append(result, f(tp))
+	}
+	return result
+}
+
 type AnalyzeResult struct {
-	TypeParams []TypeParam
+	TypeParams TypeParams
 	Variants   []Variant
 }
 

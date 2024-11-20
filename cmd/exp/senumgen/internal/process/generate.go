@@ -14,21 +14,19 @@ type GenerateArgs struct {
 }
 
 func Generate(args GenerateArgs) ([]byte, error) {
-	var defTypeParams string
-	for idx, tp := range args.AnalyzeResult.TypeParams {
-		if idx != 0 {
-			defTypeParams += ", "
-		}
-		defTypeParams += fmt.Sprintf("%s %s", tp.Name, tp.TypeName)
-	}
+	defTypeParams := strings.Join(
+		args.AnalyzeResult.TypeParams.Map(func(tp TypeParam) string {
+			return fmt.Sprintf("%s %s", tp.Name, tp.TypeName)
+		}),
+		", ",
+	)
 
-	var useTypeParams string
-	for idx, tp := range args.AnalyzeResult.TypeParams {
-		if idx != 0 {
-			useTypeParams += ", "
-		}
-		useTypeParams += tp.Name
-	}
+	useTypeParams := strings.Join(
+		args.AnalyzeResult.TypeParams.Map(func(tp TypeParam) string {
+			return tp.Name
+		}),
+		", ",
+	)
 
 	templateData := struct {
 		Package       string
