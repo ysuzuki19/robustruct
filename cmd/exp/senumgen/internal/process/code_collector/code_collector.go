@@ -55,7 +55,7 @@ func (tc *CodeCollector) Tmpl(tmpl string, args interface{}) *CodeCollector {
 
 	t, err := template.New("tmpl").Funcs(
 		template.FuncMap{
-			"capitalize": capitalize,
+			"capitalize": Capitalize,
 			"bracket":    Bracket,
 			"csvConnect": csvConnect,
 		},
