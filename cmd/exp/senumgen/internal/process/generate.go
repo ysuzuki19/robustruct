@@ -53,70 +53,85 @@ func Generate(args GenerateArgs) ([]byte, error) {
 package %s`, templateData.Package).LF().
 		Str(`
 type tag int`).LF().
-		Tmpl(`
-const (
-{{- range $variant := .Variants }}
-    tag{{ $variant.Name | capitalize }} tag = iota
-{{- end }}
-)`, struct{ Variants []Variant }{Variants: templateData.Variants}).LF().
-		Tmpl(`
-type {{ .EnumDefName }} struct {
-    {{ .Package }}{{.UseTypeParams | bracket}}
-    tag tag
-}`, struct {
-			Package       string
-			EnumDefName   string
-			UseTypeParams string
-		}{Package: templateData.Package, EnumDefName: templateData.EnumDefName, UseTypeParams: templateData.UseTypeParams}).LF().
-		Tmpl(`
-{{- range $variant := .Variants }}
-	func New{{ $variant.Name | capitalize }}{{$.DefTypeParams | bracket}}({{ if $variant.HasData }}v {{ $variant.TypeName }}{{ end }}) {{ $.EnumUseName }} {
-			return {{ $.EnumUseName }}{
-					{{ $.Package }}: {{ $.Package }}{{ $.UseTypeParams | bracket }}{
-							{{ $variant.FieldName }}: {{ if $variant.HasData }}v{{ else }}nil{{ end }},
-					},
-					tag: tag{{ $variant.Name | capitalize }},
+		Func(func(cc *code_collector.CodeCollector) *code_collector.CodeCollector {
+			cc.Str("const (")
+			defer cc.Str(")")
+			for _, variant := range templateData.Variants {
+				cc.Format("tag%s tag = iota", code_collector.Capitalize(variant.Name)).LF()
 			}
+			return cc
+		}).
+		Format(`
+type %s struct {
+    %s%s
+    tag tag
+}`, templateData.EnumDefName, templateData.Package, code_collector.Bracket(templateData.UseTypeParams)).LF().
+		Func(func(cc *code_collector.CodeCollector) *code_collector.CodeCollector {
+			for _, variant := range templateData.Variants {
+				cc.Tmpl(`
+func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasData }}v {{ .TypeName }}{{ end }}) {{ .EnumUseName }} {
+	return {{ .EnumUseName }}{
+			{{ .Package }}: {{ .Package }}{{ .UseTypeParams | bracket }}{
+					{{ .FieldName }}: {{ if .HasData }}v{{ else }}nil{{ end }},
+			},
+			tag: tag{{ .FieldName | capitalize }},
 	}
-{{- end }}`, struct {
-			Package       string
-			Variants      []Variant
-			EnumUseName   string
-			EnumDefName   string
-			DefTypeParams string
-			UseTypeParams string
-		}{
-			Package:       templateData.Package,
-			Variants:      templateData.Variants,
-			EnumUseName:   templateData.EnumUseName,
-			EnumDefName:   templateData.EnumDefName,
-			DefTypeParams: templateData.DefTypeParams,
-			UseTypeParams: templateData.UseTypeParams,
+}`, struct {
+					Package       string
+					FieldName     string
+					TypeName      string
+					HasData       bool
+					DefTypeParams string
+					EnumUseName   string
+					UseTypeParams string
+				}{
+					Package:       templateData.Package,
+					FieldName:     variant.FieldName,
+					TypeName:      variant.TypeName,
+					HasData:       variant.HasData,
+					DefTypeParams: templateData.DefTypeParams,
+					EnumUseName:   templateData.EnumUseName,
+					UseTypeParams: templateData.UseTypeParams,
+				})
+			}
+			return cc
 		}).LF().
-		Tmpl(`
-{{- range $variant := .Variants }}
-	func (e *{{ $.EnumUseName }}) Is{{ $variant.Name | capitalize }}() bool {
-			return e.tag == tag{{ $variant.Name | capitalize }}
+		Func(func(cc *code_collector.CodeCollector) *code_collector.CodeCollector {
+			for _, variant := range templateData.Variants {
+				cc.Tmpl(`
+func (e *{{ .EnumUseName }}) Is{{ .Name }}() bool {
+	return e.tag == tag{{ .Name }}
+}`, struct {
+					EnumUseName string
+					Name        string
+				}{EnumUseName: templateData.EnumUseName, Name: code_collector.Capitalize(variant.Name)})
+			}
+			return cc
+		}).LF().
+		Func(func(cc *code_collector.CodeCollector) *code_collector.CodeCollector {
+			for _, variant := range templateData.Variants {
+				if variant.HasData {
+					cc.Tmpl(`
+func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }}, bool) {
+	if e.Is{{ .FieldName | capitalize }}() {
+		return e.{{ .Package }}.{{ .FieldName }}, true
 	}
-{{- end }}`, struct {
-			EnumUseName string
-			Variants    []Variant
-		}{EnumUseName: templateData.EnumUseName, Variants: templateData.Variants}).LF().
-		Tmpl(`
-{{- range $variant := .Variants }}
-	{{- if $variant.HasData }}
-		func (e *{{ $.EnumUseName }}) As{{ $variant.Name | capitalize }}() ({{ $variant.TypeName }}, bool) {
-				if e.Is{{ $variant.Name | capitalize }}() {
-						return e.{{ $.Package }}.{{ $variant.FieldName }}, true
+	return nil, false
+}`, struct {
+						Package     string
+						EnumUseName string
+						FieldName   string
+						TypeName    string
+					}{
+						Package:     templateData.Package,
+						EnumUseName: templateData.EnumUseName,
+						FieldName:   variant.FieldName,
+						TypeName:    variant.TypeName,
+					})
 				}
-				return nil, false
-		}
-	{{- end }}
-{{- end }}`, struct {
-			Package     string
-			EnumUseName string
-			Variants    []Variant
-		}{Package: templateData.Package, EnumUseName: templateData.EnumUseName, Variants: templateData.Variants}).LF().
+			}
+			return cc
+		}).LF().
 		Tmpl(`
 type Switcher{{.DefTypeParams | bracket}} struct {
 	{{- range $variant := .Variants }}
