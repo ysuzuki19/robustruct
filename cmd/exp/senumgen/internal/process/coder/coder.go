@@ -1,4 +1,4 @@
-package tmpl
+package coder
 
 import (
 	"bytes"
@@ -6,22 +6,22 @@ import (
 	"text/template"
 )
 
-type CodeCollector struct {
+type Coder struct {
 	buf     bytes.Buffer
 	globals map[string]interface{}
 	err     error
 }
 
-func New() *CodeCollector {
+func New() *Coder {
 	var buf bytes.Buffer
-	return &CodeCollector{
+	return &Coder{
 		buf:     buf,
 		globals: make(map[string]interface{}),
 		err:     nil,
 	}
 }
 
-func (tc *CodeCollector) Globals(globals map[string]interface{}) *CodeCollector {
+func (tc *Coder) Globals(globals map[string]interface{}) *Coder {
 	if tc.err != nil {
 		return tc
 	}
@@ -29,7 +29,7 @@ func (tc *CodeCollector) Globals(globals map[string]interface{}) *CodeCollector 
 	return tc
 }
 
-func (tc *CodeCollector) LF() *CodeCollector {
+func (tc *Coder) LF() *Coder {
 	if tc.err != nil {
 		return tc
 	}
@@ -37,7 +37,7 @@ func (tc *CodeCollector) LF() *CodeCollector {
 	return tc
 }
 
-func (tc *CodeCollector) Str(content string) *CodeCollector {
+func (tc *Coder) Str(content string) *Coder {
 	if tc.err != nil {
 		return tc
 	}
@@ -45,20 +45,20 @@ func (tc *CodeCollector) Str(content string) *CodeCollector {
 	return tc
 }
 
-func (tc *CodeCollector) Format(format string, a ...any) *CodeCollector {
+func (tc *Coder) Format(format string, a ...any) *Coder {
 	content := fmt.Sprintf(format, a...)
 	tc.buf.WriteString(content)
 	return tc
 }
 
-func (tc *CodeCollector) Func(f func(tc *CodeCollector) *CodeCollector) *CodeCollector {
+func (tc *Coder) Func(f func(tc *Coder) *Coder) *Coder {
 	if tc.err != nil {
 		return tc
 	}
 	return f(tc)
 }
 
-func (tc *CodeCollector) Tmpl(tmpl string, args map[string]interface{}) *CodeCollector {
+func (tc *Coder) Tmpl(tmpl string, args map[string]interface{}) *Coder {
 	if tc.err != nil {
 		return tc
 	}
@@ -89,7 +89,7 @@ func (tc *CodeCollector) Tmpl(tmpl string, args map[string]interface{}) *CodeCol
 	return tc
 }
 
-func (tc *CodeCollector) Export() ([]byte, error) {
+func (tc *Coder) Export() ([]byte, error) {
 	if tc.err != nil {
 		return nil, tc.err
 	}

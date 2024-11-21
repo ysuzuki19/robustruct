@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	code_collector "github.com/ysuzuki19/robustruct/cmd/exp/senumgen/internal/process/code_collector"
+	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/internal/process/coder"
 )
 
 type GenerateArgs struct {
@@ -39,12 +39,12 @@ func Generate(args GenerateArgs) ([]byte, error) {
 		Package:       args.Name,
 		DefTypeParams: defTypeParams,
 		UseTypeParams: useTypeParams,
-		EnumDefName:   fmt.Sprintf("%sEnum%s", strings.ToLower(args.Name), code_collector.Bracket(defTypeParams)),
-		EnumUseName:   fmt.Sprintf("%sEnum%s", strings.ToLower(args.Name), code_collector.Bracket(useTypeParams)),
+		EnumDefName:   fmt.Sprintf("%sEnum%s", strings.ToLower(args.Name), coder.Bracket(defTypeParams)),
+		EnumUseName:   fmt.Sprintf("%sEnum%s", strings.ToLower(args.Name), coder.Bracket(useTypeParams)),
 		Variants:      args.AnalyzeResult.Variants,
 	}
 
-	cc := code_collector.New().Globals(map[string]interface{}{
+	cc := coder.New().Globals(map[string]interface{}{
 		"Package":       templateData.Package,
 		"DefTypeParams": templateData.DefTypeParams,
 		"UseTypeParams": templateData.UseTypeParams,
@@ -59,11 +59,11 @@ func Generate(args GenerateArgs) ([]byte, error) {
 package %s`, templateData.Package).LF().
 		Str(`
 type tag int`).LF().
-		Func(func(cc *code_collector.CodeCollector) *code_collector.CodeCollector {
+		Func(func(cc *coder.Coder) *coder.Coder {
 			cc.Str("const (")
 			defer cc.Str(")")
 			for _, variant := range templateData.Variants {
-				cc.Format("tag%s tag = iota", code_collector.Capitalize(variant.Name)).LF()
+				cc.Format("tag%s tag = iota", coder.Capitalize(variant.Name)).LF()
 			}
 			return cc
 		}).
@@ -71,8 +71,8 @@ type tag int`).LF().
 type %s struct {
     %s%s
     tag tag
-}`, templateData.EnumDefName, templateData.Package, code_collector.Bracket(templateData.UseTypeParams)).LF().
-		Func(func(cc *code_collector.CodeCollector) *code_collector.CodeCollector {
+}`, templateData.EnumDefName, templateData.Package, coder.Bracket(templateData.UseTypeParams)).LF().
+		Func(func(cc *coder.Coder) *coder.Coder {
 			for _, variant := range templateData.Variants {
 				cc.Tmpl(`
 func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasData }}v {{ .TypeName }}{{ end }}) {{ .EnumUseName }} {
@@ -90,18 +90,18 @@ func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasDa
 			}
 			return cc
 		}).LF().
-		Func(func(cc *code_collector.CodeCollector) *code_collector.CodeCollector {
+		Func(func(cc *coder.Coder) *coder.Coder {
 			for _, variant := range templateData.Variants {
 				cc.Tmpl(`
 func (e *{{ .EnumUseName }}) Is{{ .Name }}() bool {
 	return e.tag == tag{{ .Name }}
 }`, map[string]interface{}{
-					"Name": code_collector.Capitalize(variant.Name),
+					"Name": coder.Capitalize(variant.Name),
 				})
 			}
 			return cc
 		}).LF().
-		Func(func(cc *code_collector.CodeCollector) *code_collector.CodeCollector {
+		Func(func(cc *coder.Coder) *coder.Coder {
 			for _, variant := range templateData.Variants {
 				if variant.HasData {
 					cc.Tmpl(`
