@@ -51,10 +51,6 @@ func (c *Coder) Capitalize(s string) *Coder {
 	return c.Str(Capitalize(s))
 }
 
-func (c *Coder) Bracket(s string) *Coder {
-	return c.Str(Bracket(s))
-}
-
 func (c *Coder) Format(format string, a ...any) *Coder {
 	content := fmt.Sprintf(format, a...)
 	return c.Str(content)
@@ -68,11 +64,31 @@ func (c *Coder) Func(f func(*Coder)) *Coder {
 	return c
 }
 
-func (c *Coder) Block(start, end string, f func(*Coder)) *Coder {
+func (c *Coder) Wrap(start, end string, f func(*Coder)) *Coder {
 	if c.err != nil {
 		return c
 	}
 	return c.Str(start).Func(f).Str(end)
+}
+
+func (c *Coder) Parens(f func(*Coder)) *Coder {
+	return c.Wrap("(", ")", f)
+}
+
+func (c *Coder) Braces(f func(*Coder)) *Coder {
+	return c.Wrap("{", "}", f)
+}
+
+func (c *Coder) Block(f func(*Coder)) *Coder {
+	return c.Braces(func(c *Coder) {
+		c.LF()
+		f(c)
+		c.LF()
+	})
+}
+
+func (c *Coder) Brackets(f func(*Coder)) *Coder {
+	return c.Wrap("[", "]", f)
 }
 
 func (c *Coder) Tmpl(tmpl string, args Vars) *Coder {
