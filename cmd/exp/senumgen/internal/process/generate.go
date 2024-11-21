@@ -135,7 +135,7 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 		}).LF().
 
 		// enum Switch method
-		Tmpl("func(e *{{ .EnumUseName }})Switch", coder.Vars{}).
+		Tmpl("func(e *{{ .EnumUseName }})Switch").
 		Parens(func(c *coder.Coder) {
 			c.Str("s Switcher")
 			if templateData.UseTypeParams != "" {
@@ -158,7 +158,7 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 		}).LF().
 
 		// Matcher struct
-		Tmpl(`type Matcher[MatchResult any {{.DefTypeParams | csvConnect}}] struct`, coder.Vars{}).
+		Tmpl(`type Matcher[MatchResult any {{.DefTypeParams | csvConnect}}] struct`).
 		Block(func(c *coder.Coder) {
 			for _, variant := range templateData.Variants {
 				c.Format("%s func", coder.Capitalize(variant.Name)).Parens(func(c *coder.Coder) {
@@ -168,7 +168,7 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 				}).Str(" MatchResult").LF()
 			}
 		}).LF().
-		Tmpl(`func Match[MatchResult any {{.DefTypeParams | csvConnect}}](e *{{ .EnumUseName }}, m Matcher[MatchResult {{.UseTypeParams | csvConnect}}]) MatchResult`, coder.Vars{}).
+		Tmpl(`func Match[MatchResult any {{.DefTypeParams | csvConnect}}](e *{{ .EnumUseName }}, m Matcher[MatchResult {{.UseTypeParams | csvConnect}}]) MatchResult`).
 		Block(func(c *coder.Coder) {
 			c.Format("switch e.tag").Braces(func(c *coder.Coder) {
 				for _, variant := range templateData.Variants {
