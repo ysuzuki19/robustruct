@@ -21,60 +21,60 @@ func New() *Coder {
 	}
 }
 
-func (tc *Coder) Globals(globals map[string]interface{}) *Coder {
-	if tc.err != nil {
-		return tc
+func (c *Coder) Globals(globals map[string]interface{}) *Coder {
+	if c.err != nil {
+		return c
 	}
-	tc.globals = globals
-	return tc
+	c.globals = globals
+	return c
 }
 
-func (tc *Coder) LF() *Coder {
-	if tc.err != nil {
-		return tc
+func (c *Coder) LF() *Coder {
+	if c.err != nil {
+		return c
 	}
-	tc.buf.WriteString("\n")
-	return tc
+	c.buf.WriteString("\n")
+	return c
 }
 
-func (tc *Coder) Str(content string) *Coder {
-	if tc.err != nil {
-		return tc
+func (c *Coder) Str(content string) *Coder {
+	if c.err != nil {
+		return c
 	}
-	tc.buf.WriteString(content)
-	return tc
+	c.buf.WriteString(content)
+	return c
 }
 
-func (tc *Coder) Format(format string, a ...any) *Coder {
+func (c *Coder) Format(format string, a ...any) *Coder {
 	content := fmt.Sprintf(format, a...)
-	tc.buf.WriteString(content)
-	return tc
+	c.buf.WriteString(content)
+	return c
 }
 
-func (tc *Coder) Func(f func(tc *Coder) *Coder) *Coder {
-	if tc.err != nil {
-		return tc
+func (c *Coder) Func(f func(c *Coder) *Coder) *Coder {
+	if c.err != nil {
+		return c
 	}
-	return f(tc)
+	return f(c)
 }
 
-func (tc *Coder) Block(start, end string, f func(tc *Coder) *Coder) *Coder {
-	if tc.err != nil {
-		return tc
+func (c *Coder) Block(start, end string, f func(c *Coder) *Coder) *Coder {
+	if c.err != nil {
+		return c
 	}
-	tc.buf.WriteString(start)
-	f(tc)
-	tc.buf.WriteString(end)
-	return tc
+	c.buf.WriteString(start)
+	f(c)
+	c.buf.WriteString(end)
+	return c
 }
 
-func (tc *Coder) Tmpl(tmpl string, args map[string]interface{}) *Coder {
-	if tc.err != nil {
-		return tc
+func (c *Coder) Tmpl(tmpl string, args map[string]interface{}) *Coder {
+	if c.err != nil {
+		return c
 	}
 
 	locals := make(map[string]interface{})
-	for k, v := range tc.globals {
+	for k, v := range c.globals {
 		locals[k] = v
 	}
 	for k, v := range args {
@@ -89,19 +89,19 @@ func (tc *Coder) Tmpl(tmpl string, args map[string]interface{}) *Coder {
 		},
 	).Parse(tmpl)
 	if err != nil {
-		tc.err = err
+		c.err = err
 	}
 
-	if err := t.Execute(&tc.buf, locals); err != nil {
-		tc.err = err
+	if err := t.Execute(&c.buf, locals); err != nil {
+		c.err = err
 	}
 
-	return tc
+	return c
 }
 
-func (tc *Coder) Export() ([]byte, error) {
-	if tc.err != nil {
-		return nil, tc.err
+func (c *Coder) Export() ([]byte, error) {
+	if c.err != nil {
+		return nil, c.err
 	}
-	return tc.buf.Bytes(), nil
+	return c.buf.Bytes(), nil
 }
