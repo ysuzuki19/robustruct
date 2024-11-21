@@ -44,7 +44,7 @@ func Generate(args GenerateArgs) ([]byte, error) {
 		Variants:      args.AnalyzeResult.Variants,
 	}
 
-	cc := code_collector.NewCodeCollector()
+	cc := code_collector.New()
 
 	cc.
 		Str(`
