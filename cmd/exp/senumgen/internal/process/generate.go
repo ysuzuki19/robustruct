@@ -59,18 +59,17 @@ func Generate(args GenerateArgs) ([]byte, error) {
 package %s`, templateData.Package).LF().
 		Str(`
 type tag int`).LF().
-		Block("const (", ")", func(c *coder.Coder) *coder.Coder {
+		Block("const (", ")", func(c *coder.Coder) {
 			for _, variant := range templateData.Variants {
 				c.Format("tag%s tag = iota", coder.Capitalize(variant.Name)).LF()
 			}
-			return c
 		}).
 		Format(`
 type %s struct {
     %s%s
     tag tag
 }`, templateData.EnumDefName, templateData.Package, coder.Bracket(templateData.UseTypeParams)).LF().
-		Func(func(c *coder.Coder) *coder.Coder {
+		Func(func(c *coder.Coder) {
 			for _, variant := range templateData.Variants {
 				c.Tmpl(`
 func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasData }}v {{ .TypeName }}{{ end }}) {{ .EnumUseName }} {
@@ -86,9 +85,8 @@ func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasDa
 					"HasData":   variant.HasData,
 				})
 			}
-			return c
 		}).LF().
-		Func(func(c *coder.Coder) *coder.Coder {
+		Func(func(c *coder.Coder) {
 			for _, variant := range templateData.Variants {
 				c.Tmpl(`
 func (e *{{ .EnumUseName }}) Is{{ .Name }}() bool {
@@ -97,9 +95,8 @@ func (e *{{ .EnumUseName }}) Is{{ .Name }}() bool {
 					"Name": coder.Capitalize(variant.Name),
 				})
 			}
-			return c
 		}).LF().
-		Func(func(c *coder.Coder) *coder.Coder {
+		Func(func(c *coder.Coder) {
 			for _, variant := range templateData.Variants {
 				if variant.HasData {
 					c.Tmpl(`
@@ -114,19 +111,16 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 					})
 				}
 			}
-			return c
 		}).LF().
 		Format(`type Switcher%s struct`, coder.Bracket(templateData.DefTypeParams)).
-		Block("{", "}", func(c *coder.Coder) *coder.Coder {
+		Block("{", "}", func(c *coder.Coder) {
 			for _, variant := range templateData.Variants {
-				c.Capitalize(variant.Name).Space().Str("func").Block("(", ")", func(c *coder.Coder) *coder.Coder {
+				c.Capitalize(variant.Name).Space().Str("func").Block("(", ")", func(c *coder.Coder) {
 					if variant.HasData {
 						c.Str("v").Space().Str(variant.TypeName)
 					}
-					return c
 				}).LF()
 			}
-			return c
 		}).LF().
 		Tmpl(`
 func (e *{{ $.EnumUseName }}) Switch(s Switcher{{.UseTypeParams | bracket}}) {
