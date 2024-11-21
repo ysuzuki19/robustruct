@@ -91,7 +91,7 @@ func (c *Coder) Brackets(f func(*Coder)) *Coder {
 	return c.Wrap("[", "]", f)
 }
 
-func (c *Coder) Tmpl(tmpl string, args Vars) *Coder {
+func (c *Coder) Tmpl(tmpl string, varss ...Vars) *Coder {
 	if c.err != nil {
 		return c
 	}
@@ -100,8 +100,10 @@ func (c *Coder) Tmpl(tmpl string, args Vars) *Coder {
 	for k, v := range c.globals {
 		locals[k] = v
 	}
-	for k, v := range args {
-		locals[k] = v
+	for _, vars := range varss {
+		for k, v := range vars {
+			locals[k] = v
+		}
 	}
 
 	t, err := template.New("tmpl").Funcs(
