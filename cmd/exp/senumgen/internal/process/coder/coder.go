@@ -6,9 +6,11 @@ import (
 	"text/template"
 )
 
+type Vars map[string]interface{}
+
 type Coder struct {
 	buf     bytes.Buffer
-	globals map[string]interface{}
+	globals Vars
 	err     error
 }
 
@@ -16,12 +18,12 @@ func New() *Coder {
 	var buf bytes.Buffer
 	return &Coder{
 		buf:     buf,
-		globals: make(map[string]interface{}),
+		globals: make(Vars),
 		err:     nil,
 	}
 }
 
-func (c *Coder) Globals(globals map[string]interface{}) *Coder {
+func (c *Coder) Globals(globals Vars) *Coder {
 	if c.err != nil {
 		return c
 	}
@@ -76,12 +78,12 @@ func (c *Coder) Block(start, end string, f func(c *Coder) *Coder) *Coder {
 	return c
 }
 
-func (c *Coder) Tmpl(tmpl string, args map[string]interface{}) *Coder {
+func (c *Coder) Tmpl(tmpl string, args Vars) *Coder {
 	if c.err != nil {
 		return c
 	}
 
-	locals := make(map[string]interface{})
+	locals := make(Vars)
 	for k, v := range c.globals {
 		locals[k] = v
 	}
