@@ -64,7 +64,7 @@ func Analyze(targetDefinition TargetDefinition) (AnalyzeResult, error) {
 		switch typ := fieldType.(type) {
 		case *ast.SelectorExpr:
 			if xName, ok := typ.X.(*ast.Ident); ok {
-				if xName.Name == "senum" && typ.Sel.Name == "NonVar" {
+				if xName.Name == "types" && typ.Sel.Name == "NonVar" {
 					hasData = false
 				}
 				typeName = fmt.Sprintf("%s.%s", xName.Name, typ.Sel.Name)
