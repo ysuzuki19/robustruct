@@ -59,9 +59,7 @@ func Generate(args GenerateArgs) ([]byte, error) {
 package %s`, templateData.Package).LF().
 		Str(`
 type tag int`).LF().
-		Func(func(cc *coder.Coder) *coder.Coder {
-			cc.Str("const (")
-			defer cc.Str(")")
+		Block("const (", ")", func(cc *coder.Coder) *coder.Coder {
 			for _, variant := range templateData.Variants {
 				cc.Format("tag%s tag = iota", coder.Capitalize(variant.Name)).LF()
 			}
