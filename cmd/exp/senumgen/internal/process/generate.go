@@ -62,7 +62,7 @@ package %s`, templateData.Package).LF().
 		// enum tag
 		Str(`
 type tag int`).LF().
-		Block("const (", ")", func(c *coder.Coder) {
+		Wrap("const (", ")", func(c *coder.Coder) {
 			for _, variant := range templateData.Variants {
 				c.Format("tag%s tag = iota", coder.Capitalize(variant.Name)).LF()
 			}
@@ -124,72 +124,72 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 
 		// enum Switcher struct
 		Format(`type Switcher%s struct`, coder.Bracket(templateData.DefTypeParams)).
-		Block("{", "}", func(c *coder.Coder) {
-			c.LF()
+		Block(func(c *coder.Coder) {
 			for _, variant := range templateData.Variants {
-				c.Capitalize(variant.Name).Space().Str("func").Block("(", ")", func(c *coder.Coder) {
+				c.LF().Capitalize(variant.Name).Space().Str("func").Parens(func(c *coder.Coder) {
 					if variant.HasData {
 						c.Str("v " + variant.TypeName)
 					}
-				}).LF()
+				})
 			}
 		}).LF().
 
 		// enum Switch method
 		Str("func").
-		Block("(", ")",
-			func(c *coder.Coder) { c.Tmpl("e *{{ .EnumUseName }}", coder.Vars{}) }).
+		Parens(func(c *coder.Coder) { c.Tmpl("e *{{ .EnumUseName }}", coder.Vars{}) }).
 		Str("Switch").
-		Block("(", ")",
-			func(c *coder.Coder) {
-				c.Str("s Switcher").Bracket(templateData.UseTypeParams)
-			}).
-		Block("{", "}",
-			func(c *coder.Coder) {
-				c.LF().Str("switch e.tag").Block("{", "}", func(c *coder.Coder) {
-					for _, variant := range templateData.Variants {
-						c.LF().Format("case tag%s:", coder.Capitalize(variant.Name)).LF()
-						if variant.HasData {
-							c.Str("s.").Capitalize(variant.Name).Block("(", ")", func(c *coder.Coder) {
-								c.Format("e.%s.%s", templateData.Package, variant.FieldName)
-							})
-						} else {
-							c.Str("s.").Capitalize(variant.Name).Str("()")
-						}
+		Parens(func(c *coder.Coder) {
+			c.Str("s Switcher")
+			if templateData.UseTypeParams != "" {
+				c.Format("[%s]", templateData.UseTypeParams)
+			}
+		}).
+		Block(func(c *coder.Coder) {
+			c.Str("switch e.tag").Braces(func(c *coder.Coder) {
+				for _, variant := range templateData.Variants {
+					c.LF().Format("case tag%s:", coder.Capitalize(variant.Name))
+					if variant.HasData {
+						c.Str("s.").Capitalize(variant.Name).Parens(func(c *coder.Coder) {
+							c.Format("e.%s.%s", templateData.Package, variant.FieldName)
+						})
+					} else {
+						c.Str("s.").Capitalize(variant.Name).Str("()")
 					}
-				})
-			}).
-		LF().
+				}
+			})
+		}).LF().
 
 		// Matcher struct
-		Tmpl(`
-		type Matcher[MatchResult any {{.DefTypeParams | csvConnect}}] struct {
-		{{- range $variant := .Variants }}
-		    {{ $variant.Name | capitalize }} func({{ if $variant.HasData }}v {{ $variant.TypeName }}{{ end }}) MatchResult
-		{{- end }}
-		}`, coder.Vars{
-			"Variants": templateData.Variants,
+		Tmpl(`type Matcher[MatchResult any {{.DefTypeParams | csvConnect}}] struct`, coder.Vars{}).
+		Block(func(c *coder.Coder) {
+			for _, variant := range templateData.Variants {
+				c.Capitalize(variant.Name).Space().Str("func").Parens(func(c *coder.Coder) {
+					if variant.HasData {
+						c.Str("v " + variant.TypeName)
+					}
+				}).Space().Str("MatchResult").LF()
+			}
 		}).LF().
-		Tmpl(`func Match[MatchResult any {{.DefTypeParams | csvConnect}}](e *{{ .EnumUseName }}, m Matcher[MatchResult {{.UseTypeParams | csvConnect}}]) MatchResult {
-		    switch e.tag {
-		    {{- range $variant := .Variants }}
-					case tag{{ $variant.Name | capitalize }}:
-						{{- if $variant.HasData }}
-						return m.{{ $variant.Name | capitalize }}(e.{{ $.Package }}.{{ $variant.FieldName }})
-						{{- else }}
-						return m.{{ $variant.Name | capitalize }}()
-						{{- end }}
-		    {{- end }}
-		    }
-		    panic("unreachable: invalid tag")
-		}`, coder.Vars{
-			"Variants": templateData.Variants,
-		}).LF()
+		Tmpl(`func Match[MatchResult any {{.DefTypeParams | csvConnect}}](e *{{ .EnumUseName }}, m Matcher[MatchResult {{.UseTypeParams | csvConnect}}]) MatchResult`, coder.Vars{}).
+		Block(func(c *coder.Coder) {
+			c.Format("switch e.tag").Braces(func(c *coder.Coder) {
+				for _, variant := range templateData.Variants {
+					c.
+						Format("case tag%s:", coder.Capitalize(variant.Name)).
+						Format("return m.%s", coder.Capitalize(variant.Name)).Parens(func(c *coder.Coder) {
+						if variant.HasData {
+							c.Format("e.%s.%s", templateData.Package, variant.FieldName)
+						}
+					}).LF()
+				}
+			}).LF().Str("panic(\"unreachable: invalid tag\")")
+		})
 
 	generated, err := c.Export()
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(generated))
 
 	return generated, nil
 }
