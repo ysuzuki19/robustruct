@@ -51,6 +51,10 @@ func (c *Coder) Capitalize(s string) *Coder {
 	return c.Str(Capitalize(s))
 }
 
+func (c *Coder) Bracket(s string) *Coder {
+	return c.Str(Bracket(s))
+}
+
 func (c *Coder) Format(format string, a ...any) *Coder {
 	content := fmt.Sprintf(format, a...)
 	return c.Str(content)
@@ -104,7 +108,7 @@ func (c *Coder) Tmpl(tmpl string, args Vars) *Coder {
 
 func (c *Coder) Export() ([]byte, error) {
 	if c.err != nil {
-		return nil, c.err
+		return c.buf.Bytes(), c.err
 	}
 	return c.buf.Bytes(), nil
 }
