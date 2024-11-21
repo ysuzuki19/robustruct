@@ -116,13 +116,19 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 			}
 			return c
 		}).LF().
+		Format(`type Switcher%s struct`, coder.Bracket(templateData.DefTypeParams)).
+		Block("{", "}", func(c *coder.Coder) *coder.Coder {
+			for _, variant := range templateData.Variants {
+				c.Capitalize(variant.Name).Space().Str("func").Block("(", ")", func(c *coder.Coder) *coder.Coder {
+					if variant.HasData {
+						c.Str("v").Space().Str(variant.TypeName)
+					}
+					return c
+				}).LF()
+			}
+			return c
+		}).LF().
 		Tmpl(`
-type Switcher{{.DefTypeParams | bracket}} struct {
-	{{- range $variant := .Variants }}
-		{{ $variant.Name | capitalize }} func({{ if $variant.HasData }}v {{ $variant.TypeName }}{{ end }})
-	{{- end }}
-}
-
 func (e *{{ $.EnumUseName }}) Switch(s Switcher{{.UseTypeParams | bracket}}) {
     switch e.tag {
     {{- range $variant := .Variants }}

@@ -45,6 +45,14 @@ func (c *Coder) Str(content string) *Coder {
 	return c
 }
 
+func (c *Coder) Space() *Coder {
+	return c.Str(" ")
+}
+
+func (c *Coder) Capitalize(s string) *Coder {
+	return c.Str(Capitalize(s))
+}
+
 func (c *Coder) Format(format string, a ...any) *Coder {
 	content := fmt.Sprintf(format, a...)
 	c.buf.WriteString(content)
