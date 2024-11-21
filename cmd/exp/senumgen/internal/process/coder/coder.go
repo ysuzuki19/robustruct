@@ -31,20 +31,16 @@ func (c *Coder) Globals(globals Vars) *Coder {
 	return c
 }
 
-func (c *Coder) LF() *Coder {
-	if c.err != nil {
-		return c
-	}
-	c.buf.WriteString("\n")
-	return c
-}
-
 func (c *Coder) Str(content string) *Coder {
 	if c.err != nil {
 		return c
 	}
 	c.buf.WriteString(content)
 	return c
+}
+
+func (c *Coder) LF() *Coder {
+	return c.Str("\n")
 }
 
 func (c *Coder) Space() *Coder {
@@ -57,25 +53,22 @@ func (c *Coder) Capitalize(s string) *Coder {
 
 func (c *Coder) Format(format string, a ...any) *Coder {
 	content := fmt.Sprintf(format, a...)
-	c.buf.WriteString(content)
-	return c
+	return c.Str(content)
 }
 
-func (c *Coder) Func(f func(c *Coder) *Coder) *Coder {
+func (c *Coder) Func(f func(*Coder)) *Coder {
 	if c.err != nil {
 		return c
 	}
-	return f(c)
-}
-
-func (c *Coder) Block(start, end string, f func(c *Coder) *Coder) *Coder {
-	if c.err != nil {
-		return c
-	}
-	c.buf.WriteString(start)
 	f(c)
-	c.buf.WriteString(end)
 	return c
+}
+
+func (c *Coder) Block(start, end string, f func(*Coder)) *Coder {
+	if c.err != nil {
+		return c
+	}
+	return c.Str(start).Func(f).Str(end)
 }
 
 func (c *Coder) Tmpl(tmpl string, args Vars) *Coder {
