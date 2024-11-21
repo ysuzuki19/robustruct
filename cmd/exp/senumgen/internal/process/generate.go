@@ -62,7 +62,7 @@ package %s`, templateData.Package).LF().
 		// enum tag
 		Str(`
 type tag int`).LF().
-		Wrap("const (", ")", func(c *coder.Coder) {
+		Wrap("const (", ")", func() {
 			for _, variant := range templateData.Variants {
 				c.Format("tag%s tag = iota", coder.Capitalize(variant.Name)).LF()
 			}
@@ -74,7 +74,7 @@ type %s struct {
 }`, templateData.EnumDefName, templateData.Package, coder.Bracket(templateData.UseTypeParams)).LF().
 
 		// enum constructor
-		Func(func(c *coder.Coder) {
+		Func(func() {
 			for _, variant := range templateData.Variants {
 				c.Tmpl(`
 func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasData }}v {{ .TypeName }}{{ end }}) {{ .EnumUseName }} {
@@ -93,7 +93,7 @@ func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasDa
 		}).LF().
 
 		// enum Is{FieldName} method
-		Func(func(c *coder.Coder) {
+		Func(func() {
 			for _, variant := range templateData.Variants {
 				c.Tmpl(`
 func (e *{{ .EnumUseName }}) Is{{ .Name }}() bool {
@@ -105,7 +105,7 @@ func (e *{{ .EnumUseName }}) Is{{ .Name }}() bool {
 		}).LF().
 
 		// enum As{FieldName} method
-		Func(func(c *coder.Coder) {
+		Func(func() {
 			for _, variant := range templateData.Variants {
 				if variant.HasData {
 					c.Tmpl(`
@@ -124,9 +124,9 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 
 		// enum Switcher struct
 		Format(`type Switcher%s struct`, coder.Bracket(templateData.DefTypeParams)).
-		Block(func(c *coder.Coder) {
+		Block(func() {
 			for _, variant := range templateData.Variants {
-				c.LF().Format(" %s func", coder.Capitalize(variant.Name)).Parens(func(c *coder.Coder) {
+				c.LF().Format(" %s func", coder.Capitalize(variant.Name)).Parens(func() {
 					if variant.HasData {
 						c.Str("v " + variant.TypeName)
 					}
@@ -136,18 +136,18 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 
 		// enum Switch method
 		Tmpl("func(e *{{ .EnumUseName }})Switch").
-		Parens(func(c *coder.Coder) {
+		Parens(func() {
 			c.Str("s Switcher")
 			if templateData.UseTypeParams != "" {
 				c.Format("[%s]", templateData.UseTypeParams)
 			}
 		}).
-		Block(func(c *coder.Coder) {
-			c.Str("switch e.tag").Braces(func(c *coder.Coder) {
+		Block(func() {
+			c.Str("switch e.tag").Braces(func() {
 				for _, variant := range templateData.Variants {
 					c.LF().Format("case tag%s:", coder.Capitalize(variant.Name))
 					if variant.HasData {
-						c.Str("s.").Capitalize(variant.Name).Parens(func(c *coder.Coder) {
+						c.Str("s.").Capitalize(variant.Name).Parens(func() {
 							c.Format("e.%s.%s", templateData.Package, variant.FieldName)
 						})
 					} else {
@@ -159,9 +159,9 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 
 		// Matcher struct
 		Tmpl(`type Matcher[MatchResult any {{.DefTypeParams | csvConnect}}] struct`).
-		Block(func(c *coder.Coder) {
+		Block(func() {
 			for _, variant := range templateData.Variants {
-				c.Format("%s func", coder.Capitalize(variant.Name)).Parens(func(c *coder.Coder) {
+				c.Format("%s func", coder.Capitalize(variant.Name)).Parens(func() {
 					if variant.HasData {
 						c.Str("v " + variant.TypeName)
 					}
@@ -169,12 +169,12 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 			}
 		}).LF().
 		Tmpl(`func Match[MatchResult any {{.DefTypeParams | csvConnect}}](e *{{ .EnumUseName }}, m Matcher[MatchResult {{.UseTypeParams | csvConnect}}]) MatchResult`).
-		Block(func(c *coder.Coder) {
-			c.Format("switch e.tag").Braces(func(c *coder.Coder) {
+		Block(func() {
+			c.Format("switch e.tag").Braces(func() {
 				for _, variant := range templateData.Variants {
 					c.
 						Format("case tag%s:", coder.Capitalize(variant.Name)).
-						Format("return m.%s", coder.Capitalize(variant.Name)).Parens(func(c *coder.Coder) {
+						Format("return m.%s", coder.Capitalize(variant.Name)).Parens(func() {
 						if variant.HasData {
 							c.Format("e.%s.%s", templateData.Package, variant.FieldName)
 						}

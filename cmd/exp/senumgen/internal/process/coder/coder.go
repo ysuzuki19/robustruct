@@ -56,38 +56,38 @@ func (c *Coder) Format(format string, a ...any) *Coder {
 	return c.Str(content)
 }
 
-func (c *Coder) Func(f func(*Coder)) *Coder {
+func (c *Coder) Func(f func()) *Coder {
 	if c.err != nil {
 		return c
 	}
-	f(c)
+	f()
 	return c
 }
 
-func (c *Coder) Wrap(start, end string, f func(*Coder)) *Coder {
+func (c *Coder) Wrap(start, end string, f func()) *Coder {
 	if c.err != nil {
 		return c
 	}
 	return c.Str(start).Func(f).Str(end)
 }
 
-func (c *Coder) Parens(f func(*Coder)) *Coder {
+func (c *Coder) Parens(f func()) *Coder {
 	return c.Wrap("(", ")", f)
 }
 
-func (c *Coder) Braces(f func(*Coder)) *Coder {
+func (c *Coder) Braces(f func()) *Coder {
 	return c.Wrap("{", "}", f)
 }
 
-func (c *Coder) Block(f func(*Coder)) *Coder {
-	return c.Braces(func(c *Coder) {
+func (c *Coder) Block(f func()) *Coder {
+	return c.Braces(func() {
 		c.LF()
-		f(c)
+		f()
 		c.LF()
 	})
 }
 
-func (c *Coder) Brackets(f func(*Coder)) *Coder {
+func (c *Coder) Brackets(f func()) *Coder {
 	return c.Wrap("[", "]", f)
 }
 
