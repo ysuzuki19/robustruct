@@ -58,6 +58,16 @@ func (tc *Coder) Func(f func(tc *Coder) *Coder) *Coder {
 	return f(tc)
 }
 
+func (tc *Coder) Block(start, end string, f func(tc *Coder) *Coder) *Coder {
+	if tc.err != nil {
+		return tc
+	}
+	tc.buf.WriteString(start)
+	f(tc)
+	tc.buf.WriteString(end)
+	return tc
+}
+
 func (tc *Coder) Tmpl(tmpl string, args map[string]interface{}) *Coder {
 	if tc.err != nil {
 		return tc
