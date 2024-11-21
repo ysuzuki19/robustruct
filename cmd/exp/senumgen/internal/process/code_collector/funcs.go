@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func capitalize(s string) string {
+func Capitalize(s string) string {
 	if len(s) == 0 {
 		return s
 	}
