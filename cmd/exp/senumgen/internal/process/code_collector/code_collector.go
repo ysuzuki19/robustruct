@@ -2,6 +2,7 @@ package tmpl
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 )
 
@@ -18,7 +19,36 @@ func NewCodeCollector() *CodeCollector {
 	}
 }
 
-func (tc *CodeCollector) Merge(tmpl string, args interface{}) *CodeCollector {
+func (tc *CodeCollector) LF() *CodeCollector {
+	if tc.err != nil {
+		return tc
+	}
+	tc.buf.WriteString("\n")
+	return tc
+}
+
+func (tc *CodeCollector) Str(content string) *CodeCollector {
+	if tc.err != nil {
+		return tc
+	}
+	tc.buf.WriteString(content)
+	return tc
+}
+
+func (tc *CodeCollector) Format(format string, a ...any) *CodeCollector {
+	content := fmt.Sprintf(format, a...)
+	tc.buf.WriteString(content)
+	return tc
+}
+
+func (tc *CodeCollector) Func(f func(tc *CodeCollector) *CodeCollector) *CodeCollector {
+	if tc.err != nil {
+		return tc
+	}
+	return f(tc)
+}
+
+func (tc *CodeCollector) Tmpl(tmpl string, args interface{}) *CodeCollector {
 	if tc.err != nil {
 		return tc
 	}
