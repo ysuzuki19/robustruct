@@ -44,7 +44,7 @@ func Generate(args GenerateArgs) ([]byte, error) {
 		Variants:      args.AnalyzeResult.Variants,
 	}
 
-	c := coder.New().Globals(map[string]interface{}{
+	c := coder.New().Globals(coder.Vars{
 		"Package":       templateData.Package,
 		"DefTypeParams": templateData.DefTypeParams,
 		"UseTypeParams": templateData.UseTypeParams,
@@ -80,7 +80,7 @@ func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasDa
 			},
 			tag: tag{{ .FieldName | capitalize }},
 	}
-}`, map[string]interface{}{
+}`, coder.Vars{
 					"FieldName": variant.FieldName,
 					"TypeName":  variant.TypeName,
 					"HasData":   variant.HasData,
@@ -93,7 +93,7 @@ func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasDa
 				c.Tmpl(`
 func (e *{{ .EnumUseName }}) Is{{ .Name }}() bool {
 	return e.tag == tag{{ .Name }}
-}`, map[string]interface{}{
+}`, coder.Vars{
 					"Name": coder.Capitalize(variant.Name),
 				})
 			}
@@ -108,7 +108,7 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 		return e.{{ .Package }}.{{ .FieldName }}, true
 	}
 	return nil, false
-}`, map[string]interface{}{
+}`, coder.Vars{
 						"FieldName": variant.FieldName,
 						"TypeName":  variant.TypeName,
 					})
@@ -140,7 +140,7 @@ func (e *{{ $.EnumUseName }}) Switch(s Switcher{{.UseTypeParams | bracket}}) {
 				{{- end }}
     {{- end }}
     }
-}`, map[string]interface{}{
+}`, coder.Vars{
 			"Variants": templateData.Variants,
 		}).LF().
 		Tmpl(`
@@ -162,7 +162,7 @@ func Match[MatchResult any {{.DefTypeParams | csvConnect}}](e *{{ .EnumUseName }
     {{- end }}
     }
     panic("unreachable: invalid tag")
-}`, map[string]interface{}{
+}`, coder.Vars{
 			"Variants": templateData.Variants,
 		}).LF()
 
