@@ -44,7 +44,13 @@ func Generate(args GenerateArgs) ([]byte, error) {
 		Variants:      args.AnalyzeResult.Variants,
 	}
 
-	cc := code_collector.New()
+	cc := code_collector.New().Globals(map[string]interface{}{
+		"Package":       templateData.Package,
+		"DefTypeParams": templateData.DefTypeParams,
+		"UseTypeParams": templateData.UseTypeParams,
+		"EnumDefName":   templateData.EnumDefName,
+		"EnumUseName":   templateData.EnumUseName,
+	})
 
 	cc.
 		Str(`
@@ -76,22 +82,10 @@ func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasDa
 			},
 			tag: tag{{ .FieldName | capitalize }},
 	}
-}`, struct {
-					Package       string
-					FieldName     string
-					TypeName      string
-					HasData       bool
-					DefTypeParams string
-					EnumUseName   string
-					UseTypeParams string
-				}{
-					Package:       templateData.Package,
-					FieldName:     variant.FieldName,
-					TypeName:      variant.TypeName,
-					HasData:       variant.HasData,
-					DefTypeParams: templateData.DefTypeParams,
-					EnumUseName:   templateData.EnumUseName,
-					UseTypeParams: templateData.UseTypeParams,
+}`, map[string]interface{}{
+					"FieldName": variant.FieldName,
+					"TypeName":  variant.TypeName,
+					"HasData":   variant.HasData,
 				})
 			}
 			return cc
@@ -101,10 +95,9 @@ func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasDa
 				cc.Tmpl(`
 func (e *{{ .EnumUseName }}) Is{{ .Name }}() bool {
 	return e.tag == tag{{ .Name }}
-}`, struct {
-					EnumUseName string
-					Name        string
-				}{EnumUseName: templateData.EnumUseName, Name: code_collector.Capitalize(variant.Name)})
+}`, map[string]interface{}{
+					"Name": code_collector.Capitalize(variant.Name),
+				})
 			}
 			return cc
 		}).LF().
@@ -117,16 +110,9 @@ func (e *{{ .EnumUseName }}) As{{ .FieldName | capitalize }}() ({{ .TypeName }},
 		return e.{{ .Package }}.{{ .FieldName }}, true
 	}
 	return nil, false
-}`, struct {
-						Package     string
-						EnumUseName string
-						FieldName   string
-						TypeName    string
-					}{
-						Package:     templateData.Package,
-						EnumUseName: templateData.EnumUseName,
-						FieldName:   variant.FieldName,
-						TypeName:    variant.TypeName,
+}`, map[string]interface{}{
+						"FieldName": variant.FieldName,
+						"TypeName":  variant.TypeName,
 					})
 				}
 			}
@@ -150,13 +136,9 @@ func (e *{{ $.EnumUseName }}) Switch(s Switcher{{.UseTypeParams | bracket}}) {
 				{{- end }}
     {{- end }}
     }
-}`, struct {
-			Package       string
-			EnumUseName   string
-			Variants      []Variant
-			DefTypeParams string
-			UseTypeParams string
-		}{Package: templateData.Package, EnumUseName: templateData.EnumUseName, Variants: templateData.Variants, DefTypeParams: templateData.DefTypeParams, UseTypeParams: templateData.UseTypeParams}).LF().
+}`, map[string]interface{}{
+			"Variants": templateData.Variants,
+		}).LF().
 		Tmpl(`
 type Matcher[MatchResult any {{.DefTypeParams | csvConnect}}] struct {
 {{- range $variant := .Variants }}
@@ -176,13 +158,9 @@ func Match[MatchResult any {{.DefTypeParams | csvConnect}}](e *{{ .EnumUseName }
     {{- end }}
     }
     panic("unreachable: invalid tag")
-}`, struct {
-			Package       string
-			EnumUseName   string
-			Variants      []Variant
-			DefTypeParams string
-			UseTypeParams string
-		}{Package: templateData.Package, EnumUseName: templateData.EnumUseName, Variants: templateData.Variants, DefTypeParams: templateData.DefTypeParams, UseTypeParams: templateData.UseTypeParams}).LF()
+}`, map[string]interface{}{
+			"Variants": templateData.Variants,
+		}).LF()
 
 	generated, err := cc.Export()
 	if err != nil {

@@ -7,16 +7,26 @@ import (
 )
 
 type CodeCollector struct {
-	buf bytes.Buffer
-	err error
+	buf     bytes.Buffer
+	globals map[string]interface{}
+	err     error
 }
 
-func NewCodeCollector() *CodeCollector {
+func New() *CodeCollector {
 	var buf bytes.Buffer
 	return &CodeCollector{
-		buf: buf,
-		err: nil,
+		buf:     buf,
+		globals: make(map[string]interface{}),
+		err:     nil,
 	}
+}
+
+func (tc *CodeCollector) Globals(globals map[string]interface{}) *CodeCollector {
+	if tc.err != nil {
+		return tc
+	}
+	tc.globals = globals
+	return tc
 }
 
 func (tc *CodeCollector) LF() *CodeCollector {
@@ -48,9 +58,17 @@ func (tc *CodeCollector) Func(f func(tc *CodeCollector) *CodeCollector) *CodeCol
 	return f(tc)
 }
 
-func (tc *CodeCollector) Tmpl(tmpl string, args interface{}) *CodeCollector {
+func (tc *CodeCollector) Tmpl(tmpl string, args map[string]interface{}) *CodeCollector {
 	if tc.err != nil {
 		return tc
+	}
+
+	locals := make(map[string]interface{})
+	for k, v := range tc.globals {
+		locals[k] = v
+	}
+	for k, v := range args {
+		locals[k] = v
 	}
 
 	t, err := template.New("tmpl").Funcs(
@@ -64,7 +82,7 @@ func (tc *CodeCollector) Tmpl(tmpl string, args interface{}) *CodeCollector {
 		tc.err = err
 	}
 
-	if err := t.Execute(&tc.buf, args); err != nil {
+	if err := t.Execute(&tc.buf, locals); err != nil {
 		tc.err = err
 	}
 
