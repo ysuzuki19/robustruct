@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ysuzuki19/robustruct/cmd/exp/variantgen/internal/process/coder"
+	"github.com/ysuzuki19/robustruct/cmd/exp/internal/coder"
 )
 
 type GenerateArgs struct {
