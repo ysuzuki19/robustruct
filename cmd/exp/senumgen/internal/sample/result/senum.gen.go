@@ -8,13 +8,13 @@ const (
 	tagErr tag = iota
 )
 
-type resultEnum[T any] struct {
+type Result[T any] struct {
 	result[T]
 	tag tag
 }
 
-func NewOk[T any](v *T) resultEnum[T] {
-	return resultEnum[T]{
+func NewOk[T any](v *T) Result[T] {
+	return Result[T]{
 		result: result[T]{
 			ok: v,
 		},
@@ -22,8 +22,8 @@ func NewOk[T any](v *T) resultEnum[T] {
 	}
 }
 
-func NewErr[T any](v error) resultEnum[T] {
-	return resultEnum[T]{
+func NewErr[T any](v error) Result[T] {
+	return Result[T]{
 		result: result[T]{
 			err: v,
 		},
@@ -31,22 +31,22 @@ func NewErr[T any](v error) resultEnum[T] {
 	}
 }
 
-func (e *resultEnum[T]) IsOk() bool {
+func (e *Result[T]) IsOk() bool {
 	return e.tag == tagOk
 }
 
-func (e *resultEnum[T]) IsErr() bool {
+func (e *Result[T]) IsErr() bool {
 	return e.tag == tagErr
 }
 
-func (e *resultEnum[T]) AsOk() (*T, bool) {
+func (e *Result[T]) AsOk() (*T, bool) {
 	if e.IsOk() {
 		return e.result.ok, true
 	}
 	return nil, false
 }
 
-func (e *resultEnum[T]) AsErr() (error, bool) {
+func (e *Result[T]) AsErr() (error, bool) {
 	if e.IsErr() {
 		return e.result.err, true
 	}
@@ -58,7 +58,7 @@ type Switcher[T any] struct {
 	Err func(v error)
 }
 
-func (e *resultEnum[T]) Switch(s Switcher[T]) {
+func (e *Result[T]) Switch(s Switcher[T]) {
 	switch e.tag {
 	case tagOk:
 		s.Ok(e.result.ok)
@@ -72,7 +72,7 @@ type Matcher[MatchResult any, T any] struct {
 	Err func(v error) MatchResult
 }
 
-func Match[MatchResult any, T any](e *resultEnum[T], m Matcher[MatchResult, T]) MatchResult {
+func Match[MatchResult any, T any](e *Result[T], m Matcher[MatchResult, T]) MatchResult {
 	switch e.tag {
 	case tagOk:
 		return m.Ok(e.result.ok)

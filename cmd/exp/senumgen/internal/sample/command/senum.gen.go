@@ -12,37 +12,40 @@ const (
 	tagLocal tag = iota
 )
 
-type commandEnum struct {
+type Command struct {
 	command
 	tag tag
 }
 
-func NewHelp() commandEnum {
-	return commandEnum{
+func NewHelp() Command {
+	return Command{
 		command: command{
 			help: nil,
 		},
 		tag: tagHelp,
 	}
 }
-func NewRun(v *string) commandEnum {
-	return commandEnum{
+
+func NewRun(v *string) Command {
+	return Command{
 		command: command{
 			run: v,
 		},
 		tag: tagRun,
 	}
 }
-func NewSub(v *sub.SubCommand) commandEnum {
-	return commandEnum{
+
+func NewSub(v *sub.SubCommand) Command {
+	return Command{
 		command: command{
 			sub: v,
 		},
 		tag: tagSub,
 	}
 }
-func NewLocal(v *Local) commandEnum {
-	return commandEnum{
+
+func NewLocal(v *Local) Command {
+	return Command{
 		command: command{
 			local: v,
 		},
@@ -50,32 +53,37 @@ func NewLocal(v *Local) commandEnum {
 	}
 }
 
-func (e *commandEnum) IsHelp() bool {
+func (e *Command) IsHelp() bool {
 	return e.tag == tagHelp
 }
-func (e *commandEnum) IsRun() bool {
+
+func (e *Command) IsRun() bool {
 	return e.tag == tagRun
 }
-func (e *commandEnum) IsSub() bool {
+
+func (e *Command) IsSub() bool {
 	return e.tag == tagSub
 }
-func (e *commandEnum) IsLocal() bool {
+
+func (e *Command) IsLocal() bool {
 	return e.tag == tagLocal
 }
 
-func (e *commandEnum) AsRun() (*string, bool) {
+func (e *Command) AsRun() (*string, bool) {
 	if e.IsRun() {
 		return e.command.run, true
 	}
 	return nil, false
 }
-func (e *commandEnum) AsSub() (*sub.SubCommand, bool) {
+
+func (e *Command) AsSub() (*sub.SubCommand, bool) {
 	if e.IsSub() {
 		return e.command.sub, true
 	}
 	return nil, false
 }
-func (e *commandEnum) AsLocal() (*Local, bool) {
+
+func (e *Command) AsLocal() (*Local, bool) {
 	if e.IsLocal() {
 		return e.command.local, true
 	}
@@ -89,7 +97,7 @@ type Switcher struct {
 	Local func(v *Local)
 }
 
-func (e *commandEnum) Switch(s Switcher) {
+func (e *Command) Switch(s Switcher) {
 	switch e.tag {
 	case tagHelp:
 		s.Help()
@@ -109,7 +117,7 @@ type Matcher[MatchResult any] struct {
 	Local func(v *Local) MatchResult
 }
 
-func Match[MatchResult any](e *commandEnum, m Matcher[MatchResult]) MatchResult {
+func Match[MatchResult any](e *Command, m Matcher[MatchResult]) MatchResult {
 	switch e.tag {
 	case tagHelp:
 		return m.Help()
