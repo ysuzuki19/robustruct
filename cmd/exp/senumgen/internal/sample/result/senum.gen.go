@@ -21,6 +21,7 @@ func NewOk[T any](v *T) resultEnum[T] {
 		tag: tagOk,
 	}
 }
+
 func NewErr[T any](v error) resultEnum[T] {
 	return resultEnum[T]{
 		result: result[T]{
@@ -33,6 +34,7 @@ func NewErr[T any](v error) resultEnum[T] {
 func (e *resultEnum[T]) IsOk() bool {
 	return e.tag == tagOk
 }
+
 func (e *resultEnum[T]) IsErr() bool {
 	return e.tag == tagErr
 }
@@ -43,6 +45,7 @@ func (e *resultEnum[T]) AsOk() (*T, bool) {
 	}
 	return nil, false
 }
+
 func (e *resultEnum[T]) AsErr() (error, bool) {
 	if e.IsErr() {
 		return e.result.err, true
