@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ysuzuki19/robustruct/cmd/exp/senumgen/internal/process"
+	"github.com/ysuzuki19/robustruct/cmd/exp/variantgen/internal/process"
 )
 
 func main() {
