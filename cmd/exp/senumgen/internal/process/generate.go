@@ -65,7 +65,7 @@ func Generate(args GenerateArgs) ([]byte, error) {
 		`).
 
 		// enum constructor
-		Func(func() {
+		Fn(func() {
 			for _, variant := range variants {
 				c.Tmpl(`
 				func New{{ .FieldName | capitalize }}{{ .DefTypeParams | bracket }}({{ if .HasData }}v {{ .TypeName }}{{ end }}) {{ .EnumUseName }} {
@@ -85,7 +85,7 @@ func Generate(args GenerateArgs) ([]byte, error) {
 		}).
 
 		// enum Is{FieldName} method
-		Func(func() {
+		Fn(func() {
 			for _, variant := range variants {
 				c.Tmpl(`
 				func {{ .PointerReceiver }} Is{{ .FieldName }}() bool {
@@ -98,7 +98,7 @@ func Generate(args GenerateArgs) ([]byte, error) {
 		}).LF().
 
 		// enum As{FieldName} method
-		Func(func() {
+		Fn(func() {
 			for _, variant := range variants {
 				if variant.HasData {
 					c.Tmpl(`
