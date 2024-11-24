@@ -1,16 +1,16 @@
-package process
+package writer
 
 import (
 	"log"
 	"os"
 )
 
-type Write interface {
+type Writer interface {
 	Write(buf []byte) error
 }
 
-var _ Write = &MemoryWriter{} //ignore:fields_require
-var _ Write = &FileWriter{}   //ignore:fields_require
+var _ Writer = &MemoryWriter{} //ignore:fields_require
+var _ Writer = &FileWriter{}   //ignore:fields_require
 
 type MemoryWriter struct {
 	Content string

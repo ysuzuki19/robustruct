@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/ysuzuki19/robustruct/cmd/exp/internal/writer"
 	"github.com/ysuzuki19/robustruct/cmd/exp/variantgen/internal/process"
 )
 
@@ -22,7 +23,7 @@ func main() {
 
 	if err := process.Process(process.Args{
 		DirPath: *dirPath,
-		Writer: &process.FileWriter{
+		Writer: &writer.FileWriter{
 			FilePath: process.OutputFilePath(*dirPath),
 		},
 	}); err != nil {

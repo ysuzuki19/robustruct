@@ -1,8 +1,10 @@
 package process
 
+import "github.com/ysuzuki19/robustruct/cmd/exp/internal/writer"
+
 type Args struct {
 	DirPath string
-	Writer  Write
+	Writer  writer.Writer
 }
 
 /**
