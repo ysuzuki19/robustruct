@@ -1,6 +1,9 @@
 package process
 
-import "github.com/ysuzuki19/robustruct/cmd/exp/internal/writer"
+import (
+	"github.com/ysuzuki19/robustruct/cmd/exp/internal/postgenerate"
+	"github.com/ysuzuki19/robustruct/cmd/exp/internal/writer"
+)
 
 type Args struct {
 	DirPath string
@@ -35,7 +38,7 @@ func Process(args Args) error {
 		return err
 	}
 
-	output, err := PostGenerate(PostGenerateArgs{
+	output, err := postgenerate.PostGenerate(postgenerate.PostGenerateArgs{
 		OutputFilePath: OutputFilePath(args.DirPath),
 		Buf:            generated,
 	})
