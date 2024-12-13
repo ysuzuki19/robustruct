@@ -39,8 +39,17 @@ func (c *Coder) Str(content string) *Coder {
 	return c
 }
 
-func (c *Coder) LF() *Coder {
-	return c.Str("\n")
+func (c *Coder) LF(count ...int) *Coder {
+	if len(count) > 0 {
+		for _, cnt := range count {
+			for i := 0; i < cnt; i++ {
+				c.Str("\n")
+			}
+		}
+	} else {
+		c.Str("\n")
+	}
+	return c
 }
 
 func (c *Coder) Space() *Coder {
@@ -54,6 +63,13 @@ func (c *Coder) Capitalize(s string) *Coder {
 func (c *Coder) Format(format string, a ...any) *Coder {
 	content := fmt.Sprintf(format, a...)
 	return c.Str(content)
+}
+
+func (c *Coder) FnIf(condition bool, f func()) *Coder {
+	if condition {
+		return c.Fn(f)
+	}
+	return c
 }
 
 func (c *Coder) Fn(f func()) *Coder {
