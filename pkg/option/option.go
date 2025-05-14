@@ -1,6 +1,5 @@
 package option
 
-// deprecated: use github.com/ysuzuki19/robustruct/pkg/option instead
 type Option[T any] struct {
 	ptr *T
 }
