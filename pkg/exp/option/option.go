@@ -137,7 +137,7 @@ func (o *Option[T]) Take() Option[T] {
 	v := o.ptr
 	o.ptr = nil // change to None
 
-	return Some[T](v)
+	return Some(v)
 }
 
 func (o *Option[T]) TakeIf(predicate Check[*T]) Option[T] {
@@ -149,7 +149,7 @@ func (o *Option[T]) TakeIf(predicate Check[*T]) Option[T] {
 		return None[T]()
 	}
 	o.ptr = nil // change to None
-	return Some[T](v)
+	return Some(v)
 }
 
 func (o *Option[T]) Replace(v T) Option[T] {
