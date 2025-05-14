@@ -6,7 +6,8 @@ GO := go
 
 BIN_NAME = golangci-lint
 BUILD_PATH = bin/$(BIN_NAME)
-INSTALL_PATH = $(HOME)/.local/bin/$(BIN_NAME)
+INSTALL_DIR = $(HOME)/.local/bin
+INSTALL_PATH = $(INSTALL_DIR)/$(BIN_NAME)
 COMPARE_BINS = $(CMP) $(BUILD_PATH) $(INSTALL_PATH)
 
 build:
@@ -15,7 +16,9 @@ build:
 	@echo "Built    $(BUILD_PATH)!"
 
 install: check-built
+	@mkdir -p $(INSTALL_DIR)
 	@cp $(BUILD_PATH) $(INSTALL_PATH)
+	@echo "Installed $(BIN_NAME) at $(INSTALL_DIR)"
 
 uninstall:
 	@$(RM) $(INSTALL_PATH)
