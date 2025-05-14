@@ -16,8 +16,9 @@ build:
 	@echo "Built    $(BUILD_PATH)!"
 
 install: check-built
-	ls -ld $(INSTALL_PATH)
+	ls -ld $(INSTALL_DIR)
 	@mkdir -p $(INSTALL_DIR)
+	ls -ld $(INSTALL_DIR)
 	@cp $(BUILD_PATH) $(INSTALL_PATH)
 	@echo "Installed $(BIN_NAME) at $(INSTALL_DIR)"
 
