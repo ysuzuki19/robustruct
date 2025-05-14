@@ -16,7 +16,9 @@ build:
 	@echo "Built    $(BUILD_PATH)!"
 
 install: check-built
-	ls -ld $(INSTALL_DIR)
+	ls -ld $(HOME)
+	ls -ld $(HOME)/.local
+	ls -ld $(HOME)/.local/bin
 	@mkdir -p $(INSTALL_DIR)
 	ls -ld $(INSTALL_DIR)
 	@cp $(BUILD_PATH) $(INSTALL_PATH)
