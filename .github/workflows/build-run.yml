@@ -1,7 +1,8 @@
 name: Build and Run
 on:
   push:
-    branches: '*'
+    branches: 
+      - '*'
 
 jobs:
   build-run:
