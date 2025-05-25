@@ -1,3 +1,4 @@
+// torin DELETE BEGIN date=2025-10-01
 package option_test
 
 import (
@@ -262,3 +263,5 @@ func Test_Clone(t *testing.T) {
 		require.NotEqual(o, o2)
 	}
 }
+
+// torin DELETE END

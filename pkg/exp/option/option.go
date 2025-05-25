@@ -1,3 +1,4 @@
+// torin DELETE BEGIN date=2025-10-01
 package option
 
 // Deprecated: use github.com/ysuzuki19/robustruct/pkg/option instead
@@ -195,3 +196,5 @@ func (o Option[T]) Clone() Option[T] {
 	copied := *o.ptr // copy current value
 	return Some(&copied)
 }
+
+// torin DELETE END
