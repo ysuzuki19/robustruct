@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ysuzuki19/robustruct/pkg/exp/option"
+	"github.com/ysuzuki19/robustruct/pkg/option"
 )
 
 func Test_Some(t *testing.T) {
