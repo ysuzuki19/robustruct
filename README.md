@@ -1,10 +1,16 @@
 # robustruct
 
-Go Lint tool for struct
+Go tool for struct robustness.
 
-This tool is module plugin for `golangci-lint`.
+## Structs
 
-# Features
+- `option.Option[T]` ([details](pkg/option/README.md))
+  - Generic optional value type
+  - Provides optional value handling safety
+
+## Lint tool for struct
+
+Details in [pkg/linters/README.md](pkg/linters/README.md).
 
 - `fields_require`
   - Check all fields are initialized
@@ -12,111 +18,3 @@ This tool is module plugin for `golangci-lint`.
 - `fields_align`
   - Check all fields are aligned ordered by struct definition
   - Suggest to align fields
-
-# Sample
-
-for the following code, robustruct will suggest the following fixes.
-
-```go
-package main
-
-type Sample struct {
-    A int
-    B string
-    AA bool
-}
-```
-
-## fields_require
-
-Before fix
-
-```go
-func main() {
-    s := Sample{
-        A: 1,
-        B: "hello",
-    }
-}
-```
-
-After fix
-
-```go
-func main() {
-    s := Sample{
-        A: 1,
-        B: "hello",
-        AA: false,
-    }
-}
-```
-
-## fields_align
-
-Before fix
-
-```go
-func main() {
-    s := Sample{
-        B: "hello",
-        A: 1,
-        AA: false,
-    }
-}
-```
-
-After fix
-
-```go
-func main() {
-    s := Sample{
-        A: 1,
-        B: "hello",
-        AA: false,
-    }
-}
-```
-
-# Ignore
-
-You can disable a check with a comment.
-
-ignore all features.
-
-```go
-// ignore:robustruct
-```
-
-ignore `fields_require`.
-
-```go
-// ignore:fields_require
-```
-
-ignore `fields_align`.
-
-```go
-// ignore:fields_align
-```
-
-## Sample
-
-```go
-func main() {
-    // ignore:robustruct
-    s := Sample{
-        B: "hello",
-        A: 1,
-    }
-}
-```
-
-```go
-func main() {
-	s := Sample{
-		A: 1,
-		B: "hello",
-	} // ignore:fields_require
-}
-```
