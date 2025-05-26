@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/tools/go/analysis/analysistest"
 
-	"github.com/ysuzuki19/robustruct/pkg/robustruct"
+	"github.com/ysuzuki19/robustruct/pkg/linters/robustruct"
 )
 
 func TestE2E(t *testing.T) {

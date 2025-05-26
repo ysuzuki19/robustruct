@@ -5,9 +5,9 @@ import (
 
 	"golang.org/x/tools/go/analysis"
 
-	"github.com/ysuzuki19/robustruct/pkg/fields_align"
-	"github.com/ysuzuki19/robustruct/pkg/fields_require"
-	"github.com/ysuzuki19/robustruct/pkg/robustruct/settings"
+	"github.com/ysuzuki19/robustruct/pkg/linters/fields_align"
+	"github.com/ysuzuki19/robustruct/pkg/linters/fields_require"
+	"github.com/ysuzuki19/robustruct/pkg/linters/robustruct/settings"
 )
 
 var FeatureAnalyzers = []*analysis.Analyzer{

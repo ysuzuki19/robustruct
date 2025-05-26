@@ -9,7 +9,7 @@ import (
 
 	"github.com/ysuzuki19/robustruct/internal/field_inits"
 	"github.com/ysuzuki19/robustruct/internal/struct_init"
-	"github.com/ysuzuki19/robustruct/pkg/robustruct/settings"
+	"github.com/ysuzuki19/robustruct/pkg/linters/robustruct/settings"
 )
 
 var Analyzer = &analysis.Analyzer{
