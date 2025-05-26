@@ -144,14 +144,6 @@ func (o Option[T]) IsSomeAnd(f Check[T]) bool {
 	return false
 }
 
-// Deprecated: IsNoneOr is deprecated. Use IsSomeAnd with a negated predicate instead.
-func (o Option[T]) IsNoneOr(f Check[T]) bool {
-	if o.IsNone() {
-		return true
-	}
-	return f(*o.ptr)
-}
-
 // UnwrapOr returns the contained value if the Option is Some, or the given default value if the Option is None.
 //
 // Example:

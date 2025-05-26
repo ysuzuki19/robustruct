@@ -51,13 +51,6 @@ func Test_IsSomeAnd(t *testing.T) {
 	require.False(option.None[int]().IsSomeAnd(func(x int) bool { return x > 1 }))
 }
 
-func Test_IsNoneOr(t *testing.T) {
-	require := require.New(t)
-	require.True(option.NewSome(2).IsNoneOr(func(x int) bool { return x > 1 }))
-	require.False(option.NewSome(0).IsNoneOr(func(x int) bool { return x > 1 }))
-	require.True(option.None[int]().IsNoneOr(func(x int) bool { return x > 1 }))
-}
-
 func Test_UnwrapOr(t *testing.T) {
 	require := require.New(t)
 	require.Equal("car", option.NewSome("car").UnwrapOr("bike"))
