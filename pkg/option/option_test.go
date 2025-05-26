@@ -66,9 +66,8 @@ func Test_UnwrapOr(t *testing.T) {
 
 func Test_UnwrapOrElse(t *testing.T) {
 	require := require.New(t)
-	k := 10
-	require.Equal(4, option.NewSome(4).UnwrapOrElse(func() int { return k * 2 }))
-	require.Equal(20, option.None[int]().UnwrapOrElse(func() int { return k * 2 }))
+	require.Equal(4, option.NewSome(4).UnwrapOrElse(func() int { return 20 }))
+	require.Equal(20, option.None[int]().UnwrapOrElse(func() int { return 20 }))
 }
 
 func Test_UnwrapOrDefault(t *testing.T) {
