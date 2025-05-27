@@ -5,6 +5,7 @@ Go tool for struct robustness.
 ## Structs
 
 - `option.Option[T]` ([details](pkg/option/README.md))
+  [![Go Reference](https://pkg.go.dev/badge/github.com/ysuzuki19/robustruct/pkg/option.svg)](https://pkg.go.dev/github.com/ysuzuki19/robustruct/pkg/option)
   - Generic optional value type
   - Provides optional value handling safety
 
