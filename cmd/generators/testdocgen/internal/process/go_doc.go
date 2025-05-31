@@ -30,38 +30,25 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 					continue
 				}
 
-				fnName := fn.Name.Name
-				if recvTypeName == structName && fnName == td.FuncName {
-					begin, end, err := FindExampleRange(fset, fn.Doc.List)
-					if err != nil {
-						return nil, fmt.Errorf("failed to find example range: %w", err)
-					}
-					lines := strings.Split(td.Content, "\n")
-					for i := range lines {
-						lines[i] = "// " + lines[i]
-					}
-					plans = append(plans, Plan{
-						Begin: begin,
-						End:   end,
-						Lines: lines,
-					})
+				if *recvTypeName != *structName {
+					continue
 				}
-			} else {
-				if fn.Name.Name == td.FuncName {
-					begin, end, err := FindExampleRange(fset, fn.Doc.List)
-					if err != nil {
-						return nil, fmt.Errorf("failed to find example range: %w", err)
-					}
-					lines := strings.Split(td.Content, "\n")
-					for i := range lines {
-						lines[i] = "// " + lines[i]
-					}
-					plans = append(plans, Plan{
-						Begin: begin,
-						End:   end,
-						Lines: lines,
-					})
+			}
+
+			if fn.Name.Name == td.FuncName {
+				begin, end, err := FindExampleRange(fset, fn.Doc.List)
+				if err != nil {
+					return nil, fmt.Errorf("failed to find example range: %w", err)
 				}
+				lines := strings.Split(td.Content, "\n")
+				for i := range lines {
+					lines[i] = "// " + lines[i]
+				}
+				plans = append(plans, Plan{
+					Begin: begin,
+					End:   end,
+					Lines: lines,
+				})
 			}
 		}
 	}
