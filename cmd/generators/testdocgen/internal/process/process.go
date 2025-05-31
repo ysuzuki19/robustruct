@@ -105,6 +105,9 @@ func Process(args Args) error {
 		return fmt.Errorf("failed to update Go doc: %w", err)
 	}
 
+	fmt.Println("TestDoc Count:", len(tds))
+	fmt.Println("Plan Count:", len(plans))
+
 	updated := ApplyGoDoc(source, plans)
 	if updated == source {
 		return nil
