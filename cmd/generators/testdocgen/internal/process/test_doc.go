@@ -8,7 +8,7 @@ import (
 )
 
 type testDocOpening struct {
-	Index         int
+	LineNo        int
 	StructureName option.Option[string]
 	FuncName      string
 }
@@ -28,7 +28,7 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 		if rest, ok := matchAndStrip(tdRegex, line); ok {
 			if rest, ok := matchAndStrip(tdBeginRegex, rest); ok {
 				if opened.IsSome() {
-					return nil, fmt.Errorf("testdoc begin found but already opened at line %v", opened.Ptr().Index)
+					return nil, fmt.Errorf("testdoc begin found but already opened at line %v", opened.Ptr().LineNo)
 				}
 				trimed := strings.TrimSpace(rest)
 				parts := strings.Split(trimed, ".")
@@ -36,14 +36,14 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 				case 1:
 					opened = option.NewSome(
 						testDocOpening{
-							Index:         idx,
+							LineNo:        idx,
 							StructureName: option.None[string](),
 							FuncName:      parts[0],
 						})
 				case 2:
 					opened = option.NewSome(
 						testDocOpening{
-							Index:         idx,
+							LineNo:        idx,
 							StructureName: option.Some(&parts[0]),
 							FuncName:      parts[1],
 						})
@@ -56,7 +56,7 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 					tds = append(tds, TestDoc{
 						StructName: begin.StructureName,
 						FuncName:   begin.FuncName,
-						Content:    strings.Join(lines[begin.Index+1:idx], "\n"),
+						Content:    strings.Join(lines[begin.LineNo+1:idx], "\n"),
 					})
 				} else {
 					return nil, fmt.Errorf("testdoc end found but not opened")
