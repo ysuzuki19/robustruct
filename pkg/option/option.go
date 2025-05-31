@@ -74,8 +74,9 @@ func Some[T any](v *T) Option[T] {
 //
 // Example:
 //
-//	opt := option.NewSome(42)
-//	fmt.Println(opt.IsSome()) // Output: true
+//	o := option.NewSome(1)
+//	require.True(o.IsSome())
+//	require.Equal(1, *o.Ptr())
 func NewSome[T any](v T) Option[T] {
 	return Some(&v)
 }
@@ -84,8 +85,9 @@ func NewSome[T any](v T) Option[T] {
 //
 // Example:
 //
-//	opt := option.None[int]()
-//	fmt.Println(opt.IsNone()) // Output: true
+//	o := option.None[int]()
+//	require.True(o.IsNone())
+//	require.Nil(o.Ptr())
 func None[T any]() Option[T] {
 	return Option[T]{ptr: nil}
 }
@@ -121,14 +123,24 @@ func (o Option[T]) Ptr() *T {
 }
 
 // Get returns the contained value and a boolean indicating whether the Option is Some.
-//
-// Example:
+// Usecase:
 //
 //	if v, ok := opt.Get(); ok {
 //		// something with `v`
 //	} else {
 //		// fallback without `v`
 //	}
+//
+// Example:
+//
+//	v := 1
+//	ptr, isSome := option.Some(&v).Get()
+//	require.True(isSome)
+//	require.Equal(&v, ptr)
+//
+//	ptr, isSome = option.None[int]().Get()
+//	require.False(isSome)
+//	require.Nil(ptr)
 func (o Option[T]) Get() (*T, bool) {
 	return o.ptr, o.IsSome()
 }
@@ -213,14 +225,6 @@ func (o Option[T]) Filter(f Check[*T]) Option[T] {
 //
 //	x = option.None[int]()
 //	y = option.NewSome(3)
-//	require.Equal(x.Or(y), y)
-//
-//	x = option.NewSome(2)
-//	y = option.NewSome(3)
-//	require.Equal(x.Or(y), x)
-//
-//	x = option.None[int]()
-//	y = option.None[int]()
 //	require.Equal(x.Or(y), y)
 func (o Option[T]) Or(optb Option[T]) Option[T] {
 	if o.IsSome() {
