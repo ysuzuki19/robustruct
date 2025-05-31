@@ -32,7 +32,6 @@ type TestDoc struct {
 
 type Args struct {
 	CodePath string
-	TestPath string
 	Writer   writer.Writer
 }
 
@@ -50,55 +49,6 @@ func LoadFilePair(codePath string) (source string, test string, err error) {
 	}
 	test = string(b)
 	return
-}
-
-func ParseTestDocs(test string) ([]TestDoc, error) {
-	lines := strings.Split(test, "\n")
-	var tds []TestDoc
-	opened := option.None[TestDocOpening]()
-
-	for idx, line := range lines {
-		if rest, ok := matchAndStrip(tdRegex, line); ok {
-			if rest, ok := matchAndStrip(tdBeginRegex, rest); ok {
-				if opened.IsSome() {
-					return nil, fmt.Errorf("testdoc begin found but already opened at line %v", *opened.Ptr())
-				}
-				trimed := strings.TrimSpace(rest)
-				parts := strings.Split(trimed, ".")
-				switch len(parts) {
-				case 1:
-					opened = option.NewSome(
-						TestDocOpening{
-							Index:         idx,
-							StructureName: option.None[string](),
-							FuncName:      parts[0],
-						})
-				case 2:
-					opened = option.NewSome(
-						TestDocOpening{
-							Index:         idx,
-							StructureName: option.Some(&parts[0]),
-							FuncName:      parts[1],
-						})
-				default:
-					return nil, fmt.Errorf("testdoc begin line must contain either 'begin StructName' or 'begin StructName.FuncName'")
-				}
-			}
-			if _, ok := matchAndStrip(tdEndRegex, rest); ok {
-				if begin, ok := opened.Take().Get(); ok {
-					tds = append(tds, TestDoc{
-						StructName: begin.StructureName,
-						FuncName:   begin.FuncName,
-						Content:    strings.Join(lines[begin.Index+1:idx], "\n"),
-					})
-				} else {
-					return nil, fmt.Errorf("testdoc end found but not opened")
-				}
-			}
-		}
-	}
-
-	return tds, nil
 }
 
 type Plan struct {
@@ -132,32 +82,12 @@ func FindExampleRange(fset *token.FileSet, docList []*ast.Comment) (int, int, er
 		}
 	}
 	if exm, ok := exampleAnnotation.Get(); ok {
-		return *exm, searched + 1, nil
+		if *exm == searched {
+			return *exm, searched, nil
+		}
+		return *exm, searched, nil
 	}
 	return 0, 0, fmt.Errorf("Example not found in doc comments")
-}
-
-func RecvTypeName(fn *ast.FuncDecl) option.Option[string] {
-	if fn.Recv == nil || len(fn.Recv.List) == 0 {
-		return option.None[string]()
-	}
-	switch t := fn.Recv.List[0].Type.(type) {
-	case *ast.Ident:
-		return option.Some(&t.Name)
-	case *ast.StarExpr:
-		if ident, ok := t.X.(*ast.Ident); ok {
-			return option.Some(&ident.Name)
-		}
-	case *ast.IndexExpr:
-		if ident, ok := t.X.(*ast.Ident); ok {
-			return option.Some(&ident.Name)
-		}
-	case *ast.IndexListExpr:
-		if ident, ok := t.X.(*ast.Ident); ok {
-			return option.Some(&ident.Name)
-		}
-	}
-	return option.None[string]()
 }
 
 func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
@@ -188,10 +118,6 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 					if err != nil {
 						return nil, fmt.Errorf("failed to find example range: %w", err)
 					}
-					//TODO use strchain
-					// lines := strchain.String(td.Content).Split("\n").Map(func(line string) string {
-					// 	return "// " + line
-					// })
 					lines := strings.Split(td.Content, "\n")
 					for i := range lines {
 						lines[i] = "// " + lines[i]
@@ -215,7 +141,7 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 					plans = append(plans, Plan{
 						Begin: begin,
 						End:   end,
-						Lines: strings.Split(td.Content, "\n"),
+						Lines: lines,
 					})
 				}
 			}
@@ -232,7 +158,9 @@ func ApplyGoDoc(source string, plans []Plan) string {
 	lines := strings.Split(source, "\n")
 	for _, plan := range plans {
 		fmt.Println("Applying plan:", plan.Begin, plan.End, plan.Lines)
-		lines = append(lines[:plan.Begin-1], append(plan.Lines, lines[plan.End-1:]...)...)
+		above := lines[:plan.Begin]
+		below := lines[plan.End:]
+		lines = append(above, append(plan.Lines, below...)...)
 	}
 
 	return strings.Join(lines, "\n")
@@ -259,8 +187,8 @@ func Process(args Args) error {
 		return nil
 	}
 
-	fmt.Println("Updating source code...")
-	fmt.Println(updated)
+	// fmt.Println("Updating source code...")
+	// fmt.Println(updated)
 
 	// formatted, err := postgenerate.PostGenerate(
 	// 	postgenerate.PostGenerateArgs{
@@ -271,10 +199,10 @@ func Process(args Args) error {
 	// 	return fmt.Errorf("failed to format updated source: %w", err)
 	// }
 
-	// err = args.Writer.Write(formatted)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to write updated source: %w", err)
-	// }
+	err = args.Writer.Write([]byte(updated))
+	if err != nil {
+		return fmt.Errorf("failed to write updated source: %w", err)
+	}
 
 	return nil
 }
