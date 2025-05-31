@@ -31,7 +31,6 @@ func LoadArgs() (*Args, error) {
 	}
 
 	if args.File == "" {
-		log.Fatal("file argument is required")
 		return nil, fmt.Errorf("file argument is required")
 	}
 
