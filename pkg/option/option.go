@@ -425,3 +425,4 @@ func (o Option[T]) Clone() Option[T] {
 }
 
 //go:generate go run ../../cmd/generators/testdocgen/main.go -- -file=$GOFILE
+//TODO go:generate go run github.com/ysuzuki19/robustruct@feature/testdocgen/cmd/generators/testdocgen/main.go -- -file=$GOFILE
