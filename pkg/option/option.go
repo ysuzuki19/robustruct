@@ -272,18 +272,10 @@ func (o Option[T]) Xor(optb Option[T]) Option[T] {
 //
 // Example:
 //
-//	{
-//		v := o.Insert(1)
-//		require.Equal(o.Ptr(), v)
-//		require.Equal(1, *v)
-//		require.Equal(1, *o.Ptr())
-//	}
-//	{
-//		v := o.Insert(2)
-//		require.Equal(2, *v)
-//		*v = 3
-//		require.Equal(3, *o.Ptr())
-//	}
+//	v := o.Insert(1)
+//	require.Equal(o.Ptr(), v)
+//	require.Equal(1, *v)
+//	require.Equal(1, *o.Ptr())
 func (o *Option[T]) Insert(v T) *T {
 	o.ptr = &v
 	return o.ptr
@@ -293,13 +285,9 @@ func (o *Option[T]) Insert(v T) *T {
 //
 // Example:
 //
-//	o := option.None[int]()
-//	{
-//		v := o.GetOrInsert(1)
-//		require.Equal(1, *v)
-//		*v = 7
-//	}
-//	require.Equal(option.NewSome(7), o)
+//	v := o.GetOrInsert(1)
+//	require.Equal(1, *v)
+//	*v = 7
 func (o *Option[T]) GetOrInsert(v T) *T {
 	if o.IsNone() {
 		o.ptr = &v
@@ -312,13 +300,9 @@ func (o *Option[T]) GetOrInsert(v T) *T {
 //
 // Example:
 //
-//	o := option.None[int]()
-//	{
-//		v := o.GetOrInsertDefault()
-//		require.Equal(0, *v)
-//		*v = 7
-//	}
-//	require.Equal(option.NewSome(7), o)
+//	v := o.GetOrInsertDefault()
+//	require.Equal(0, *v)
+//	*v = 7
 func (o *Option[T]) GetOrInsertDefault() *T {
 	var v T // set zero value
 	return o.GetOrInsert(v)
@@ -366,19 +350,16 @@ func (o *Option[T]) Take() Option[T] {
 //
 // Example:
 //
-//	o := option.NewSome(2)
-//	{
-//		prev := o.TakeIf(func(x *int) bool {
-//			if *x == 2 {
-//				*x += 1
-//				return false
-//			} else {
-//				return false
-//			}
-//		})
-//		require.Equal(option.NewSome(3), o)
-//		require.Equal(option.None[int](), prev)
-//	}
+//	prev := o.TakeIf(func(x *int) bool {
+//		if *x == 2 {
+//			*x += 1
+//			return false
+//		} else {
+//			return false
+//		}
+//	})
+//	require.Equal(option.NewSome(3), o)
+//	require.Equal(option.None[int](), prev)
 func (o *Option[T]) TakeIf(predicate Check[*T]) Option[T] {
 	if o.IsNone() {
 		return None[T]()
