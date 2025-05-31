@@ -10,12 +10,14 @@ import (
 
 func Test_Some(t *testing.T) {
 	require := require.New(t)
+	// testdoc begin Some
 	v := 1
 	o := option.Some(&v)
 	require.True(o.IsSome())
 	require.Equal(&v, o.Ptr())
 	v = 2
 	require.Equal(2, *o.Ptr())
+	// testdoc end
 }
 
 func Test_NewSome(t *testing.T) {
@@ -46,9 +48,11 @@ func Test_Get(t *testing.T) {
 
 func Test_IsSomeAnd(t *testing.T) {
 	require := require.New(t)
+	// testdoc begin Option.IsSomeAnd
 	require.True(option.NewSome(2).IsSomeAnd(func(x int) bool { return x > 1 }))
 	require.False(option.NewSome(0).IsSomeAnd(func(x int) bool { return x > 1 }))
 	require.False(option.None[int]().IsSomeAnd(func(x int) bool { return x > 1 }))
+	// testdoc end
 }
 
 func Test_UnwrapOr(t *testing.T) {
@@ -245,6 +249,7 @@ func Test_Replace(t *testing.T) {
 func Test_Clone(t *testing.T) {
 	require := require.New(t)
 	{
+		// testdoc begin Option.Clone
 		o := option.NewSome(2)
 		o2 := o.Clone()
 		require.Equal(option.NewSome(2), o)
@@ -252,5 +257,6 @@ func Test_Clone(t *testing.T) {
 		require.Equal(o, o2)
 		*o.Ptr() = 3 // o2 should not be affected
 		require.NotEqual(o, o2)
+		// testdoc end
 	}
 }

@@ -416,3 +416,5 @@ func (o Option[T]) Clone() Option[T] {
 	copied := *o.ptr // copy current value
 	return Some(&copied)
 }
+
+//go:generate go run ../../cmd/generators/testdocgen/main.go -- -file=$GOFILE
