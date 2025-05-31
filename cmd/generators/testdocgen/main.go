@@ -52,12 +52,12 @@ func main() {
 
 	if err := process.Process(process.Args{
 		CodePath: codePath,
-		Writer: &writer.MemoryWriter{
-			Content: "",
-		},
-		// Writer: &writer.FileWriter{
-		// 	FilePath: process.OutputFilePath(*dirPath),
+		// Writer: &writer.MemoryWriter{
+		// 	Content: "",
 		// },
+		Writer: &writer.FileWriter{
+			FilePath: codePath,
+		},
 	}); err != nil {
 		log.Fatal(err)
 	}
