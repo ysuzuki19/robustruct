@@ -46,7 +46,7 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 				lines := strchain.FromSlice([]string{"", "Example:"}).
 					Extend(strchain.From(td.Content).Split("\n")).
 					Map(func(line string) string {
-						return "// " + line
+						return "//" + line
 					}).Collect()
 				plans = append(plans, Plan{
 					InsertIndex:  insertLine,
