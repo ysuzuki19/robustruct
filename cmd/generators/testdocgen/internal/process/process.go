@@ -139,5 +139,3 @@ func matchAndStrip(re *regexp.Regexp, input string) (string, bool) {
 	}
 	return input[:loc[0]] + input[loc[1]:], true
 }
-
-// go run ../../cmd/generators/testdocgen/main.go -- -file=$GOFILE
