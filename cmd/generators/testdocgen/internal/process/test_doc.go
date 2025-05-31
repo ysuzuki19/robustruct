@@ -7,10 +7,22 @@ import (
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
 
+type testDocOpening struct {
+	Index         int
+	StructureName option.Option[string]
+	FuncName      string
+}
+
+type TestDoc struct {
+	StructName option.Option[string]
+	FuncName   string
+	Content    string
+}
+
 func ParseTestDocs(test string) ([]TestDoc, error) {
 	lines := strings.Split(test, "\n")
 	var tds []TestDoc
-	opened := option.None[TestDocOpening]()
+	opened := option.None[testDocOpening]()
 
 	for idx, line := range lines {
 		if rest, ok := matchAndStrip(tdRegex, line); ok {
@@ -23,14 +35,14 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 				switch len(parts) {
 				case 1:
 					opened = option.NewSome(
-						TestDocOpening{
+						testDocOpening{
 							Index:         idx,
 							StructureName: option.None[string](),
 							FuncName:      parts[0],
 						})
 				case 2:
 					opened = option.NewSome(
-						TestDocOpening{
+						testDocOpening{
 							Index:         idx,
 							StructureName: option.Some(&parts[0]),
 							FuncName:      parts[1],

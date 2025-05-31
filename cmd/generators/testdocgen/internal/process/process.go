@@ -3,7 +3,6 @@ package process
 import (
 	"fmt"
 	"go/ast"
-	"go/parser"
 	"go/token"
 	"os"
 	"regexp"
@@ -18,18 +17,6 @@ import (
 var tdRegex = regexp.MustCompile(`^\s*//\s*testdoc\s+`)
 var tdBeginRegex = regexp.MustCompile(`^\s*begin\s+`)
 var tdEndRegex = regexp.MustCompile(`^\s*end$`)
-
-type TestDocOpening struct {
-	Index         int
-	StructureName option.Option[string]
-	FuncName      string
-}
-
-type TestDoc struct {
-	StructName option.Option[string]
-	FuncName   string
-	Content    string
-}
 
 type Args struct {
 	CodePath string
@@ -89,66 +76,6 @@ func FindExampleRange(fset *token.FileSet, docList []*ast.Comment) (int, int, er
 		return *exm, searched, nil
 	}
 	return 0, 0, fmt.Errorf("Example not found in doc comments")
-}
-
-func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
-	fset := token.NewFileSet()
-	file, err := parser.ParseFile(fset, "", source, parser.ParseComments)
-	if err != nil {
-		return nil, err
-	}
-
-	plans := []Plan{}
-
-	for _, td := range tds {
-		for _, decl := range file.Decls {
-			fn, ok := decl.(*ast.FuncDecl)
-			if !ok {
-				continue
-			}
-
-			if structName, ok := td.StructName.Get(); ok {
-				recvTypeName, ok := recvTypeName(fn).Get()
-				if !ok {
-					continue
-				}
-
-				fnName := fn.Name.Name
-				if recvTypeName == structName && fnName == td.FuncName {
-					begin, end, err := FindExampleRange(fset, fn.Doc.List)
-					if err != nil {
-						return nil, fmt.Errorf("failed to find example range: %w", err)
-					}
-					lines := strings.Split(td.Content, "\n")
-					for i := range lines {
-						lines[i] = "// " + lines[i]
-					}
-					plans = append(plans, Plan{
-						Begin: begin,
-						End:   end,
-						Lines: lines,
-					})
-				}
-			} else {
-				if fn.Name.Name == td.FuncName {
-					begin, end, err := FindExampleRange(fset, fn.Doc.List)
-					if err != nil {
-						return nil, fmt.Errorf("failed to find example range: %w", err)
-					}
-					lines := strings.Split(td.Content, "\n")
-					for i := range lines {
-						lines[i] = "// " + lines[i]
-					}
-					plans = append(plans, Plan{
-						Begin: begin,
-						End:   end,
-						Lines: lines,
-					})
-				}
-			}
-		}
-	}
-	return plans, nil
 }
 
 func ApplyGoDoc(source string, plans []Plan) string {
