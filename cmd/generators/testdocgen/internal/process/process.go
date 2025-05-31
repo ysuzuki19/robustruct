@@ -7,10 +7,10 @@ import (
 	"os"
 	"regexp"
 	"sort"
-	"strings"
 
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/postgenerate"
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/writer"
+	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
 
@@ -30,7 +30,7 @@ func LoadFilePair(codePath string) (source string, test string, err error) {
 	}
 	source = string(b)
 
-	testPath := strings.Replace(codePath, ".go", "_test.go", 1)
+	testPath := strchain.From(codePath).Replace(".go", "_test.go", 1).String()
 	b, err = os.ReadFile(testPath)
 	if err != nil {
 		return
@@ -78,15 +78,13 @@ func ApplyGoDoc(source string, plans []Plan) string {
 		return plans[i].InsertIndex > plans[j].InsertIndex
 	})
 
-	lines := strings.Split(source, "\n")
+	lines := strchain.From(source).Split("\n")
 	for _, plan := range plans {
 		// fmt.Println("Applying plan:", plan.InsertIndex, plan.ReplaceCount)
-		above := lines[:plan.InsertIndex]
-		below := lines[plan.InsertIndex+plan.ReplaceCount:]
-		lines = append(above, append(plan.Lines, below...)...)
+		lines.Splice(plan.InsertIndex, plan.ReplaceCount, plan.Lines)
 	}
 
-	return strings.Join(lines, "\n")
+	return lines.Join("\n").String()
 }
 
 func Process(args Args) error {

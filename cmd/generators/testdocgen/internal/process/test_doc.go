@@ -2,8 +2,8 @@ package process
 
 import (
 	"fmt"
-	"strings"
 
+	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
 
@@ -20,18 +20,17 @@ type TestDoc struct {
 }
 
 func ParseTestDocs(test string) ([]TestDoc, error) {
-	lines := strings.Split(test, "\n")
+	lines := strchain.From(test).Split("\n")
 	var tds []TestDoc
 	opened := option.None[testDocOpening]()
 
-	for idx, line := range lines {
+	for idx, line := range lines.Collect() {
 		if rest, ok := matchAndStrip(tdRegex, line); ok {
 			if rest, ok := matchAndStrip(tdBeginRegex, rest); ok {
 				if opened.IsSome() {
 					return nil, fmt.Errorf("testdoc begin found but already opened at line %v", opened.Ptr().LineNo)
 				}
-				trimed := strings.TrimSpace(rest)
-				parts := strings.Split(trimed, ".")
+				parts := strchain.From(rest).TrimSpace().Split(".").Collect()
 				switch len(parts) {
 				case 1:
 					opened = option.NewSome(
@@ -56,7 +55,7 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 					tds = append(tds, TestDoc{
 						StructName: begin.StructureName,
 						FuncName:   begin.FuncName,
-						Content:    strings.Join(lines[begin.LineNo+1:idx], "\n"),
+						Content:    lines.Slice(begin.LineNo+1, idx).Join("\n").String(),
 					})
 				} else {
 					return nil, fmt.Errorf("testdoc end found but not opened")

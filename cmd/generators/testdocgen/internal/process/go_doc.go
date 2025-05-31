@@ -5,7 +5,8 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"strings"
+
+	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 )
 
 func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
@@ -42,10 +43,11 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 					return nil, fmt.Errorf("failed to find example range: %w", err)
 				}
 				// fmt.Printf("fn(%s) example position: %d %d\n", fn.Name.Name, insertLine, replaceCount)
-				lines := append([]string{"", "Example:"}, strings.Split(td.Content, "\n")...)
-				for i := range lines {
-					lines[i] = "// " + lines[i]
-				}
+				lines := strchain.FromSlice([]string{"", "Example:"}).
+					Extend(strchain.From(td.Content).Split("\n")).
+					Map(func(line string) string {
+						return "// " + line
+					}).Collect()
 				plans = append(plans, Plan{
 					InsertIndex:  insertLine,
 					ReplaceCount: replaceCount,
