@@ -411,11 +411,6 @@ func (o *Option[T]) Replace(v T) Option[T] {
 //
 //	o := option.NewSome(2)
 //	o2 := o.Clone()
-//	require.Equal(option.NewSome(2), o)
-//	require.Equal(option.NewSome(2), o2)
-//	require.Equal(o, o2)
-//	*o.Ptr() = 3 // o2 should not be affected
-//	require.NotEqual(o, o2)
 func (o Option[T]) Clone() Option[T] {
 	if o.IsNone() {
 		return None[T]()
