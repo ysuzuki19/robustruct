@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/ysuzuki19/robustruct/cmd/generators/internal/postgenerate"
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/writer"
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
@@ -187,19 +188,16 @@ func Process(args Args) error {
 		return nil
 	}
 
-	// fmt.Println("Updating source code...")
-	// fmt.Println(updated)
+	formatted, err := postgenerate.PostGenerate(
+		postgenerate.PostGenerateArgs{
+			Buf: []byte(updated),
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to format updated source: %w", err)
+	}
 
-	// formatted, err := postgenerate.PostGenerate(
-	// 	postgenerate.PostGenerateArgs{
-	// 		Buf: []byte(updated),
-	// 	},
-	// )
-	// if err != nil {
-	// 	return fmt.Errorf("failed to format updated source: %w", err)
-	// }
-
-	err = args.Writer.Write([]byte(updated))
+	err = args.Writer.Write([]byte(formatted))
 	if err != nil {
 		return fmt.Errorf("failed to write updated source: %w", err)
 	}
