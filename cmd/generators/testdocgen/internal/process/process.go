@@ -85,7 +85,6 @@ func ApplyGoDoc(source string, plans []Plan) string {
 
 	lines := strings.Split(source, "\n")
 	for _, plan := range plans {
-		fmt.Println("Applying plan:", plan.Begin, plan.End, plan.Lines)
 		above := lines[:plan.Begin]
 		below := lines[plan.End:]
 		lines = append(above, append(plan.Lines, below...)...)
