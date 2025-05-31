@@ -40,18 +40,18 @@ func LoadFilePair(codePath string) (source string, test string, err error) {
 }
 
 type Plan struct {
-	Begin int
-	End   int
-	Lines []string
+	InsertIndex  int
+	ReplaceCount int
+	Lines        []string
 }
 
-func FindExampleRange(fset *token.FileSet, docList []*ast.Comment) (int, int, error) {
-	exampleAnnotation := option.None[int]()
+func FindExamplePosition(fset *token.FileSet, docList []*ast.Comment) (int, int, error) {
 	begin := option.None[int]()
 	var searched int
 	for _, comment := range docList {
 		searched = fset.Position(comment.Pos()).Line
-		if exampleAnnotation.IsSome() {
+		if begin.IsSome() {
+			// if exampleAnnotation.IsSome() {
 			// if comment.Text == "//" {
 			// 	if begin, ok := begin.Get(); ok {
 			// 		return *begin, searched, nil
@@ -63,30 +63,26 @@ func FindExampleRange(fset *token.FileSet, docList []*ast.Comment) (int, int, er
 			// 	}
 			// }
 		} else if regexp.MustCompile(`^\s*//\s*Example:?.*`).MatchString(comment.Text) {
-			if exampleAnnotation.IsSome() {
-				return 0, 0, fmt.Errorf("Nested Example Detected %d", *begin.Ptr())
-			}
-			exampleAnnotation = option.NewSome(searched)
+			begin = option.NewSome(searched - 1)
 		}
 	}
-	if exm, ok := exampleAnnotation.Get(); ok {
-		if *exm == searched {
-			return *exm, searched, nil
-		}
-		return *exm, searched, nil
+	if exm, ok := begin.Get(); ok {
+		return *exm, searched - *exm, nil
 	}
-	return 0, 0, fmt.Errorf("Example not found in doc comments")
+	// if `Example:` is not found, we return the last searched line as the end
+	return searched, 0, nil
 }
 
 func ApplyGoDoc(source string, plans []Plan) string {
 	sort.Slice(plans, func(i, j int) bool {
-		return plans[i].Begin > plans[j].Begin
+		return plans[i].InsertIndex > plans[j].InsertIndex
 	})
 
 	lines := strings.Split(source, "\n")
 	for _, plan := range plans {
-		above := lines[:plan.Begin]
-		below := lines[plan.End:]
+		// fmt.Println("Applying plan:", plan.InsertIndex, plan.ReplaceCount)
+		above := lines[:plan.InsertIndex]
+		below := lines[plan.InsertIndex+plan.ReplaceCount:]
 		lines = append(above, append(plan.Lines, below...)...)
 	}
 

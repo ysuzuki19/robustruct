@@ -36,21 +36,24 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 			}
 
 			if fn.Name.Name == td.FuncName {
-				begin, end, err := FindExampleRange(fset, fn.Doc.List)
+				insertLine, replaceCount, err := FindExamplePosition(fset, fn.Doc.List)
 				if err != nil {
 					return nil, fmt.Errorf("failed to find example range: %w", err)
 				}
-				lines := strings.Split(td.Content, "\n")
+				fmt.Printf("fn(%s) example position: %d %d\n", fn.Name.Name, insertLine, replaceCount)
+				lines := append([]string{"Example:"}, strings.Split(td.Content, "\n")...)
 				for i := range lines {
 					lines[i] = "// " + lines[i]
 				}
 				plans = append(plans, Plan{
-					Begin: begin,
-					End:   end,
-					Lines: lines,
+					InsertIndex:  insertLine,
+					ReplaceCount: replaceCount,
+					Lines:        lines,
 				})
 			}
 		}
+		// TODO: check some undetected cases,
+		// return plans, fmt.Errorf("no matching function found for %s", td.FuncName)
 	}
 	return plans, nil
 }
