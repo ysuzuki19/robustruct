@@ -107,7 +107,7 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 			}
 
 			if structName, ok := td.StructName.Get(); ok {
-				recvTypeName, ok := RecvTypeName(fn).Get()
+				recvTypeName, ok := recvTypeName(fn).Get()
 				if !ok {
 					continue
 				}

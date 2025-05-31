@@ -6,7 +6,7 @@ import (
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
 
-func RecvTypeName(fn *ast.FuncDecl) option.Option[string] {
+func recvTypeName(fn *ast.FuncDecl) option.Option[string] {
 	if fn.Recv == nil || len(fn.Recv.List) == 0 {
 		return option.None[string]()
 	}
