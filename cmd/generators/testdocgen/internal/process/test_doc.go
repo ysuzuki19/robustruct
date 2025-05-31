@@ -28,7 +28,7 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 		if rest, ok := matchAndStrip(tdRegex, line); ok {
 			if rest, ok := matchAndStrip(tdBeginRegex, rest); ok {
 				if opened.IsSome() {
-					return nil, fmt.Errorf("testdoc begin found but already opened at line %v", *opened.Ptr())
+					return nil, fmt.Errorf("testdoc begin found but already opened at line %v", opened.Ptr().Index)
 				}
 				trimed := strings.TrimSpace(rest)
 				parts := strings.Split(trimed, ".")
