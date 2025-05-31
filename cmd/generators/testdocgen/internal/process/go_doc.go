@@ -18,6 +18,7 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 	plans := []Plan{}
 
 	for _, td := range tds {
+		planed := false
 		for _, decl := range file.Decls {
 			fn, ok := decl.(*ast.FuncDecl)
 			if !ok {
@@ -40,8 +41,8 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 				if err != nil {
 					return nil, fmt.Errorf("failed to find example range: %w", err)
 				}
-				fmt.Printf("fn(%s) example position: %d %d\n", fn.Name.Name, insertLine, replaceCount)
-				lines := append([]string{"Example:"}, strings.Split(td.Content, "\n")...)
+				// fmt.Printf("fn(%s) example position: %d %d\n", fn.Name.Name, insertLine, replaceCount)
+				lines := append([]string{"", "Example:"}, strings.Split(td.Content, "\n")...)
 				for i := range lines {
 					lines[i] = "// " + lines[i]
 				}
@@ -50,10 +51,13 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 					ReplaceCount: replaceCount,
 					Lines:        lines,
 				})
+				planed = true
+				break
 			}
 		}
-		// TODO: check some undetected cases,
-		// return plans, fmt.Errorf("no matching function found for %s", td.FuncName)
+		if !planed {
+			return plans, fmt.Errorf("no matching function found for %s.%s", td.StructName.UnwrapOrDefault(), td.FuncName)
+		}
 	}
 	return plans, nil
 }
