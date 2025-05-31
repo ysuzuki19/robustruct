@@ -60,9 +60,12 @@ type OptionFactory[T any] func() Option[T]
 //
 // Example:
 //
-//	val := 42
-//	opt := option.Some(&val)
-//	fmt.Println(opt.IsSome()) // Output: true
+//	v := 1
+//	o := option.Some(&v)
+//	require.True(o.IsSome())
+//	require.Equal(&v, o.Ptr())
+//	v = 2
+//	require.Equal(2, *o.Ptr())
 func Some[T any](v *T) Option[T] {
 	return Option[T]{ptr: v}
 }
