@@ -2,7 +2,7 @@ name: Go Generate and Push
 on:
   push:
     branches: 
-      - '*'
+      - '**'
 
 jobs:
   build-run:
