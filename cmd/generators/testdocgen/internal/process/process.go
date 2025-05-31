@@ -81,7 +81,7 @@ func ApplyGoDoc(source string, plans []Plan) string {
 	lines := strchain.From(source).Split("\n")
 	for _, plan := range plans {
 		// fmt.Println("Applying plan:", plan.InsertIndex, plan.ReplaceCount)
-		lines.Splice(plan.InsertIndex, plan.ReplaceCount, plan.Lines)
+		lines = lines.Splice(plan.InsertIndex, plan.ReplaceCount, plan.Lines)
 	}
 
 	return lines.Join("\n").String()
@@ -106,10 +106,12 @@ func Process(args Args) error {
 	fmt.Println("TestDoc Count:", len(tds))
 	fmt.Println("Plan Count:", len(plans))
 
+	// fmt.Println(source)
 	updated := ApplyGoDoc(source, plans)
 	if updated == source {
 		return nil
 	}
+	// fmt.Println(updated)
 
 	formatted, err := postgenerate.PostGenerate(
 		postgenerate.PostGenerateArgs{
