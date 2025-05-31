@@ -52,16 +52,16 @@ func FindExampleRange(fset *token.FileSet, docList []*ast.Comment) (int, int, er
 	for _, comment := range docList {
 		searched = fset.Position(comment.Pos()).Line
 		if exampleAnnotation.IsSome() {
-			if comment.Text == "//" {
-				if begin, ok := begin.Get(); ok {
-					return *begin, searched, nil
-				}
-			} else {
-				if begin.IsNone() {
-					pos := fset.Position(comment.Pos())
-					begin = option.NewSome(pos.Line)
-				}
-			}
+			// if comment.Text == "//" {
+			// 	if begin, ok := begin.Get(); ok {
+			// 		return *begin, searched, nil
+			// 	}
+			// } else {
+			// 	if begin.IsNone() {
+			// 		pos := fset.Position(comment.Pos())
+			// 		begin = option.NewSome(pos.Line)
+			// 	}
+			// }
 		} else if regexp.MustCompile(`^\s*//\s*Example:?.*`).MatchString(comment.Text) {
 			if exampleAnnotation.IsSome() {
 				return 0, 0, fmt.Errorf("Nested Example Detected %d", *begin.Ptr())
