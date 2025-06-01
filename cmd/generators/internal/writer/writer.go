@@ -27,7 +27,7 @@ type FileWriter struct {
 
 func (w *FileWriter) Write(buf []byte) error {
 	if err := os.WriteFile(w.FilePath, buf, 0644); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return nil
 }
