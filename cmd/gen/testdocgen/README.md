@@ -7,7 +7,7 @@ testdocgen generates example code from test files.
 add following line to the target Go source file.
 
 ```go
-//go:generate github.com/ysuzuki19/robustruct/cmd/gen/testdocgen -file=$GOFILE
+//go:generate go run github.com/ysuzuki19/robustruct/cmd/gen/testdocgen -file=$GOFILE
 package lib
 
 type Struct struct {
@@ -47,7 +47,7 @@ then run `go generate` command.
 `testdocgen` will generate (update) example code in the target Go source file.
 
 ```go
-//go:generate github.com/ysuzuki19/robustruct/cmd/gen/testdocgen -file=$GOFILE
+//go:generate go run github.com/ysuzuki19/robustruct/cmd/gen/testdocgen -file=$GOFILE
 package lib
 
 type Struct struct {
