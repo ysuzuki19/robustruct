@@ -1,6 +1,7 @@
 package process
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,14 +10,28 @@ import (
 func TestRegexps(t *testing.T) {
 	require := require.New(t)
 
-	line := "// testdoc begin StructName.FuncName"
-	require.True(tdRegex.MatchString(line), "Must to be matched: `%s`", line)
-
-	line = "begin StructName.FuncName"
-	require.True(tdBeginRegex.MatchString(line), "Must to be matched: `%s`", line)
-	require.True(tdBeginRegex.MatchString(" "+line), "Must to be matched: ` %s`", line)
-
-	line = "end"
-	require.True(tdEndRegex.MatchString(line), "Must to be matched: `%s`", line)
-	require.True(tdEndRegex.MatchString(" "+line), "Must to be matched: ` %s`", line)
+	cases := []struct {
+		line string
+		re   *regexp.Regexp
+	}{
+		{
+			line: "// testdoc begin StructName.FuncName",
+			re:   tdRegex,
+		},
+		{
+			line: "begin StructName.FuncName",
+			re:   tdBeginRegex,
+		},
+		{
+			line: "end",
+			re:   tdEndRegex,
+		},
+	}
+	for _, c := range cases {
+		require.True(c.re.MatchString(c.line), "Must to be matched: `%s`", c.line)
+		require.True(c.re.MatchString(" "+c.line), "Must to be matched: `%s`", c.line)
+		require.True(c.re.MatchString("\t"+c.line), "Must to be matched: `%s`", c.line)
+		require.False(c.re.MatchString("x"+c.line), "Must to be unmatched: `%s`", c.line)
+		require.False(c.re.MatchString("// "+c.line), "Must to be unmatched: `%s`", c.line)
+	}
 }
