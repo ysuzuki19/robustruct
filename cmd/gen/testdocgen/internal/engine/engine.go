@@ -3,8 +3,8 @@ package engine
 import (
 	"fmt"
 
-	"github.com/ysuzuki19/robustruct/cmd/generators/internal/postgenerate"
-	"github.com/ysuzuki19/robustruct/cmd/generators/internal/writer"
+	"github.com/ysuzuki19/robustruct/cmd/gen/internal/postgenerate"
+	"github.com/ysuzuki19/robustruct/cmd/gen/internal/writer"
 )
 
 type Args struct {

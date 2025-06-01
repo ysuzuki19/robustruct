@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/ysuzuki19/robustruct/cmd/generators/internal/writer"
+	"github.com/ysuzuki19/robustruct/cmd/gen/internal/writer"
 )
 
 func TestMemoryWriter(t *testing.T) {

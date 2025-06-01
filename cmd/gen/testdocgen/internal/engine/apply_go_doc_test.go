@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/engine"
+	"github.com/ysuzuki19/robustruct/cmd/gen/testdocgen/internal/engine"
 )
 
 func TestApplyGoDoc(t *testing.T) {

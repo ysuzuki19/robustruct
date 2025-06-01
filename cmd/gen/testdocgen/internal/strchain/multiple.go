@@ -133,4 +133,4 @@ func (m multiple) Entries() []single {
 	return entries
 }
 
-//go:generate go run github.com/ysuzuki19/robustruct/cmd/generators/testdocgen -file=$GOFILE
+//go:generate go run github.com/ysuzuki19/robustruct/cmd/gen/testdocgen -file=$GOFILE

@@ -3,7 +3,7 @@ package engine
 import (
 	"os"
 
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
+	"github.com/ysuzuki19/robustruct/cmd/gen/testdocgen/internal/strchain"
 )
 
 func LoadFilePair(codePath string) (source string, test string, err error) {

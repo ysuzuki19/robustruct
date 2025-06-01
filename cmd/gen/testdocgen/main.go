@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ysuzuki19/robustruct/cmd/generators/internal/writer"
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/engine"
+	"github.com/ysuzuki19/robustruct/cmd/gen/internal/writer"
+	"github.com/ysuzuki19/robustruct/cmd/gen/testdocgen/internal/engine"
 )
 
 type Args struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
+	"github.com/ysuzuki19/robustruct/cmd/gen/testdocgen/internal/strchain"
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
 

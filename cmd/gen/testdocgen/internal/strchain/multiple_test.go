@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
+	"github.com/ysuzuki19/robustruct/cmd/gen/testdocgen/internal/strchain"
 )
 
 func TestFromSlice(t *testing.T) {

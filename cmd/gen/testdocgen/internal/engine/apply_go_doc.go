@@ -3,7 +3,7 @@ package engine
 import (
 	"sort"
 
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
+	"github.com/ysuzuki19/robustruct/cmd/gen/testdocgen/internal/strchain"
 )
 
 func ApplyGoDoc(source string, plans []Plan) string {

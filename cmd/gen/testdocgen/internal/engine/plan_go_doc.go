@@ -5,8 +5,8 @@ import (
 	"go/parser"
 	"go/token"
 
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/engine/astutil"
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
+	"github.com/ysuzuki19/robustruct/cmd/gen/testdocgen/internal/engine/astutil"
+	"github.com/ysuzuki19/robustruct/cmd/gen/testdocgen/internal/strchain"
 )
 
 type Plan struct {

@@ -88,4 +88,4 @@ func (s single) Split(sep string) multiple {
 	return FromSlice(strings.Split(s.String(), sep))
 }
 
-//go:generate go run github.com/ysuzuki19/robustruct/cmd/generators/testdocgen -file=$GOFILE
+//go:generate go run github.com/ysuzuki19/robustruct/cmd/gen/testdocgen -file=$GOFILE

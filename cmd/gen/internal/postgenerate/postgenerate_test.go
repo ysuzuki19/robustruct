@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/ysuzuki19/robustruct/cmd/generators/internal/postgenerate"
+	"github.com/ysuzuki19/robustruct/cmd/gen/internal/postgenerate"
 )
 
 func TestPostGenerate(t *testing.T) {

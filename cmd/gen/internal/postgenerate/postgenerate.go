@@ -26,4 +26,4 @@ func PostGenerate(args PostGenerateArgs) ([]byte, error) {
 	return formattedCode, nil
 }
 
-//go:generate go run github.com/ysuzuki19/robustruct/cmd/generators/testdocgen -file=$GOFILE
+//go:generate go run github.com/ysuzuki19/robustruct/cmd/gen/testdocgen -file=$GOFILE
