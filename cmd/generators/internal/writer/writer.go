@@ -15,6 +15,12 @@ type MemoryWriter struct {
 	Content string
 }
 
+// Example:
+//
+//	w := &writer.MemoryWriter{}
+//	err := w.Write([]byte("Hello, World!"))
+//	require.NoError(err)
+//	require.Equal("Hello, World!", w.Content)
 func (w *MemoryWriter) Write(buf []byte) error {
 	w.Content = string(buf)
 	return nil
@@ -30,3 +36,5 @@ func (w *FileWriter) Write(buf []byte) error {
 	}
 	return nil
 }
+
+//go:generate go run ../../testdocgen/main.go -- -file=$GOFILE
