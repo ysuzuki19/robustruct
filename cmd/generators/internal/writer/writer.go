@@ -43,4 +43,4 @@ func (w *FileWriter) Write(buf []byte) error {
 	return nil
 }
 
-//go:generate go run ../../testdocgen/main.go -- -file=$GOFILE
+//go:generate go run github.com/ysuzuki19/robustruct/cmd/generators/testdocgen -file=$GOFILE
