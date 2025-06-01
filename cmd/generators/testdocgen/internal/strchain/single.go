@@ -21,7 +21,7 @@ func (s single) String() string {
 	return s.s
 }
 
-// TrimSpace
+// TrimSpace returns a strings.TrimSpace applied string.
 //
 // Example:
 //
@@ -33,7 +33,7 @@ func (s single) TrimSpace() single {
 	return s
 }
 
-// Replace
+// Replace returns a strings.Replace applied string.
 //
 // Example:
 //
@@ -45,7 +45,7 @@ func (s single) Replace(old, new string, n int) single {
 	return s
 }
 
-// Split
+// Split returns a multiple containing the substrings of the string
 //
 // Example:
 //
