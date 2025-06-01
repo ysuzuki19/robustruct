@@ -101,4 +101,18 @@ func (m multiple) Collect() []string {
 	return m.ss
 }
 
+// Example:
+//
+//	entries := strchain.FromSlice([]string{"a", "b", "c"}).Entries()
+//	require.Equal(strchain.From("a"), entries[0])
+//	require.Equal(strchain.From("b"), entries[1])
+//	require.Equal(strchain.From("c"), entries[2])
+func (m multiple) Entries() []single {
+	entries := make([]single, len(m.ss))
+	for i, s := range m.ss {
+		entries[i] = From(s)
+	}
+	return entries
+}
+
 //go:generate go run ../../main.go -- -file=$GOFILE

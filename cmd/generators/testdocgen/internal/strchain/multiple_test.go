@@ -83,3 +83,13 @@ func TestCollect(t *testing.T) {
 	require.Equal([]string{"a", "b", "c"}, data)
 	// testdoc end
 }
+
+func TestEntries(t *testing.T) {
+	require := require.New(t)
+	// testdoc begin multiple.Entries
+	entries := strchain.FromSlice([]string{"a", "b", "c"}).Entries()
+	require.Equal(strchain.From("a"), entries[0])
+	require.Equal(strchain.From("b"), entries[1])
+	require.Equal(strchain.From("c"), entries[2])
+	// testdoc end
+}
