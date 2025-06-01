@@ -31,12 +31,10 @@ func Run(args Args) error {
 	fmt.Println("TestDoc Count:", len(tds))
 	fmt.Println("Plan Count:", len(plans))
 
-	// fmt.Println(source)
 	updated := ApplyGoDoc(source, plans)
 	if updated == source {
 		return nil
 	}
-	// fmt.Println(updated)
 
 	formatted, err := postgenerate.PostGenerate(
 		postgenerate.PostGenerateArgs{
