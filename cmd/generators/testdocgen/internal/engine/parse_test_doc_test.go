@@ -37,7 +37,7 @@ func TestRegexps(t *testing.T) {
 	}
 }
 
-func TestParseTestDocsNormal(t *testing.T) {
+func TestAnalyzeTestDocsNormal(t *testing.T) {
 	require := require.New(t)
 
 	test := `
