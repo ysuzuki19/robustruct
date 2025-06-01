@@ -1,11 +1,11 @@
-package for_testdocgen_test
+package lib_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	lib "github.com/ysuzuki19/robustruct/example/for_testdocgen"
+	"example/for_testdocgen/lib"
 )
 
 func TestNewUser(t *testing.T) {

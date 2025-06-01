@@ -1,5 +1,5 @@
 //go:generate go run github.com/ysuzuki19/robustruct/cmd/gen/testdocgen -file=$GOFILE
-package for_testdocgen
+package lib
 
 type User struct {
 	Name string
