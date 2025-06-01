@@ -17,3 +17,5 @@ func PostGenerate(args PostGenerateArgs) ([]byte, error) {
 
 	return formattedCode, nil
 }
+
+//go:generate go run ../../testdocgen/main.go -- -file=$GOFILE
