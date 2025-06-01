@@ -30,6 +30,12 @@ type FileWriter struct {
 	FilePath string
 }
 
+// Example:
+//
+//	w := &writer.MemoryWriter{}
+//	err := w.Write([]byte("Hello, World!"))
+//	require.NoError(err)
+//	require.Equal("Hello, World!", w.Content)
 func (w *FileWriter) Write(buf []byte) error {
 	if err := os.WriteFile(w.FilePath, buf, 0644); err != nil {
 		return err
