@@ -9,7 +9,7 @@ import (
 
 func TestFromSlice(t *testing.T) {
 	require := require.New(t)
-	// testdoc begin multiple.Slice
+	// testdoc begin FromSlice
 	m := strchain.FromSlice([]string{"a", "b", "c"})
 	require.Equal([]string{"a", "b", "c"}, m.Collect())
 	// testdoc end
@@ -21,6 +21,15 @@ func TestSlice(t *testing.T) {
 	input := []string{"a", "b", "c", "d", "e"}
 	require.Equal([]string{"a", "b"}, strchain.FromSlice(input).Slice(0, 2).Collect())
 	require.Equal([]string{"d", "e"}, strchain.FromSlice(input).Slice(3, -1).Collect())
+	// testdoc end
+}
+
+func TestSplice(t *testing.T) {
+	require := require.New(t)
+	// testdoc begin multiple.Splice
+	m := strchain.FromSlice([]string{"a", "b", "c", "d"})
+	m = m.Splice(1, 2, []string{"x", "y"})
+	require.Equal([]string{"a", "x", "y", "d"}, m.Collect())
 	// testdoc end
 }
 
