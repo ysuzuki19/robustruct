@@ -15,6 +15,15 @@ func TestFromSlice(t *testing.T) {
 	// testdoc end
 }
 
+func TestCollect(t *testing.T) {
+	require := require.New(t)
+	// testdoc begin multiple.Collect
+	m := strchain.FromSlice([]string{"a", "b", "c"})
+	data := m.Collect()
+	require.Equal([]string{"a", "b", "c"}, data)
+	// testdoc end
+}
+
 func TestSlice(t *testing.T) {
 	require := require.New(t)
 	// testdoc begin multiple.Slice
@@ -72,15 +81,6 @@ func TestJoin(t *testing.T) {
 	m := strchain.FromSlice([]string{"a", "b", "c"})
 	s := m.Join(", ")
 	require.Equal("a, b, c", s.String())
-	// testdoc end
-}
-
-func TestCollect(t *testing.T) {
-	require := require.New(t)
-	// testdoc begin multiple.Collect
-	m := strchain.FromSlice([]string{"a", "b", "c"})
-	data := m.Collect()
-	require.Equal([]string{"a", "b", "c"}, data)
 	// testdoc end
 }
 

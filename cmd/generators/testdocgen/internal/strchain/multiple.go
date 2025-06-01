@@ -16,6 +16,17 @@ func FromSlice(ss []string) multiple {
 	return multiple{ss}
 }
 
+// Collect returns the `[]string` from the chaining object.
+//
+// Example:
+//
+//	m := strchain.FromSlice([]string{"a", "b", "c"})
+//	data := m.Collect()
+//	require.Equal([]string{"a", "b", "c"}, data)
+func (m multiple) Collect() []string {
+	return m.ss
+}
+
 // Slice returns a new string chaining object with a slice of the original strings.
 //
 // Example:
@@ -104,17 +115,6 @@ func (m multiple) Extend(other multiple) multiple {
 //	require.Equal("a, b, c", s.String())
 func (m multiple) Join(sep string) single {
 	return From(strings.Join(m.ss, sep))
-}
-
-// Collect returns the `[]string` from the chaining object.
-//
-// Example:
-//
-//	m := strchain.FromSlice([]string{"a", "b", "c"})
-//	data := m.Collect()
-//	require.Equal([]string{"a", "b", "c"}, data)
-func (m multiple) Collect() []string {
-	return m.ss
 }
 
 // Entries returns a slice of single objects representing each string in the chaining object.
