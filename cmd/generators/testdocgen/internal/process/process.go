@@ -2,38 +2,14 @@ package process
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/postgenerate"
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/writer"
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 )
 
 type Args struct {
 	CodePath string
 	Writer   writer.Writer
-}
-
-func LoadFilePair(codePath string) (source string, test string, err error) {
-	b, err := os.ReadFile(codePath)
-	if err != nil {
-		return
-	}
-	source = string(b)
-
-	testPath := strchain.From(codePath).Replace(".go", "_test.go", 1).String()
-	b, err = os.ReadFile(testPath)
-	if err != nil {
-		return
-	}
-	test = string(b)
-	return
-}
-
-type Plan struct {
-	InsertIndex  int
-	ReplaceCount int
-	Lines        []string
 }
 
 func Process(args Args) error {
