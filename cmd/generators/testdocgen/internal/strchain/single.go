@@ -9,7 +9,7 @@ type single struct {
 	s string
 }
 
-// From
+// From returns a string chaining object
 //
 // Example:
 //
@@ -19,7 +19,7 @@ func From(s string) single {
 	return single{s}
 }
 
-// String
+// String returns the standard string
 func (s single) String() string {
 	return s.s
 }

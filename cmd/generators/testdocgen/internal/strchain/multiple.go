@@ -6,6 +6,8 @@ type multiple struct {
 	ss []string
 }
 
+// FromSlice returns a string chaining object from a `[]string`.
+//
 // Example:
 //
 //	m := strchain.FromSlice([]string{"a", "b", "c"})
@@ -14,6 +16,8 @@ func FromSlice(ss []string) multiple {
 	return multiple{ss}
 }
 
+// Slice returns a new string chaining object with a slice of the original strings.
+//
 // Example:
 //
 //	input := []string{"a", "b", "c", "d", "e"}
@@ -29,6 +33,8 @@ func (m multiple) Slice(start, end int) multiple {
 	return FromSlice(m.ss[start:end])
 }
 
+// Splice modifies the string chaining object by removing a slice of strings
+//
 // Example:
 //
 //	m := strchain.FromSlice([]string{"a", "b", "c", "d"})
@@ -45,6 +51,8 @@ func (m multiple) Splice(start, count int, ss []string) multiple {
 	return m
 }
 
+// Map applies a function to each string in the chaining object and returns a new chaining object.
+//
 // Example:
 //
 //	data := strchain.
@@ -61,6 +69,8 @@ func (m multiple) Map(fn func(string) string) multiple {
 	return m
 }
 
+// Append adds one or more strings to the end of the chaining object.
+//
 // Example:
 //
 //	m := strchain.
@@ -72,6 +82,8 @@ func (m multiple) Append(s ...string) multiple {
 	return m
 }
 
+// Extend appends another chaining object to the current object.
+//
 // Example:
 //
 //	m1 := strchain.FromSlice([]string{"a", "b"})
@@ -83,6 +95,8 @@ func (m multiple) Extend(other multiple) multiple {
 	return m
 }
 
+// Join concatenates the strings in the chaining object with a separator.
+//
 // Example:
 //
 //	m := strchain.FromSlice([]string{"a", "b", "c"})
@@ -92,6 +106,8 @@ func (m multiple) Join(sep string) single {
 	return From(strings.Join(m.ss, sep))
 }
 
+// Collect returns the `[]string` from the chaining object.
+//
 // Example:
 //
 //	m := strchain.FromSlice([]string{"a", "b", "c"})
@@ -101,6 +117,8 @@ func (m multiple) Collect() []string {
 	return m.ss
 }
 
+// Entries returns a slice of single objects representing each string in the chaining object.
+//
 // Example:
 //
 //	entries := strchain.FromSlice([]string{"a", "b", "c"}).Entries()
