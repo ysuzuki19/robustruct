@@ -3,7 +3,6 @@ package process
 import (
 	"fmt"
 	"os"
-	"sort"
 
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/postgenerate"
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/writer"
@@ -35,20 +34,6 @@ type Plan struct {
 	InsertIndex  int
 	ReplaceCount int
 	Lines        []string
-}
-
-func ApplyGoDoc(source string, plans []Plan) string {
-	sort.Slice(plans, func(i, j int) bool {
-		return plans[i].InsertIndex > plans[j].InsertIndex
-	})
-
-	lines := strchain.From(source).Split("\n")
-	for _, plan := range plans {
-		// fmt.Println("Applying plan:", plan.InsertIndex, plan.ReplaceCount)
-		lines = lines.Splice(plan.InsertIndex, plan.ReplaceCount, plan.Lines)
-	}
-
-	return lines.Join("\n").String()
 }
 
 func Process(args Args) error {
