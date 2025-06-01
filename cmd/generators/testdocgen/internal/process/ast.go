@@ -6,6 +6,16 @@ import (
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
 
+func ListFnDecls(file *ast.File) []*ast.FuncDecl {
+	decls := []*ast.FuncDecl{}
+	for _, decl := range file.Decls {
+		if fn, ok := decl.(*ast.FuncDecl); ok {
+			decls = append(decls, fn)
+		}
+	}
+	return decls
+}
+
 func recvTypeName(fn *ast.FuncDecl) option.Option[string] {
 	if fn.Recv == nil || len(fn.Recv.List) == 0 {
 		return option.None[string]()

@@ -2,7 +2,6 @@ package process
 
 import (
 	"fmt"
-	"go/ast"
 	"go/parser"
 	"go/token"
 
@@ -20,12 +19,7 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 
 	for _, td := range tds {
 		planed := false
-		for _, decl := range file.Decls {
-			fn, ok := decl.(*ast.FuncDecl)
-			if !ok {
-				continue
-			}
-
+		for _, fn := range ListFnDecls(file) {
 			if structName, ok := td.StructName.Get(); ok {
 				recvTypeName, ok := recvTypeName(fn).Get()
 				if !ok {

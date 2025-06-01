@@ -21,6 +21,31 @@ func createSource(parts ...string) string {
 		String()
 }
 
+func TestListFnDecls(t *testing.T) {
+	require := require.New(t)
+
+	source := `
+package sample
+func Utility() {}
+func (s Sample) Method() {}
+func (s *Sample) RefMethod() {}
+func (s Sample[T]) GenericMethod() {}
+func (s *Sample[T]) GenericRefMethod() {}
+`
+
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, "", source, parser.ParseComments)
+	require.NoError(err)
+
+	decls := ListFnDecls(file)
+	require.Len(decls, 5)
+	require.Equal("Utility", decls[0].Name.Name)
+	require.Equal("Method", decls[1].Name.Name)
+	require.Equal("RefMethod", decls[2].Name.Name)
+	require.Equal("GenericMethod", decls[3].Name.Name)
+	require.Equal("GenericRefMethod", decls[4].Name.Name)
+}
+
 func TestRecvTypeName(t *testing.T) {
 	require := require.New(t)
 
