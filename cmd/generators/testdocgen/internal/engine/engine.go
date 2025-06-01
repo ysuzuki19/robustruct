@@ -12,6 +12,12 @@ type Args struct {
 	Writer   writer.Writer
 }
 
+// Run executes the testdocgen engine.
+// 1. Loads the source and test files.
+// 2. Parses the testdoc annotations from the test file.
+// 3. Plans the updates to the Go doc based on the parsed testdoc annotations.
+// 4. Format the updated source code.
+// 5. Writes the formatted source code to the specified writer.
 func Run(args Args) error {
 	source, test, err := LoadFilePair(args.CodePath)
 	if err != nil {
