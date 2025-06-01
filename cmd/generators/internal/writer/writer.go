@@ -1,7 +1,6 @@
 package writer
 
 import (
-	"log"
 	"os"
 )
 
