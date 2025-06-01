@@ -14,9 +14,6 @@ import (
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
 
-var tdRegex = regexp.MustCompile(`^\s*//\s*testdoc\s+`)
-var tdBeginRegex = regexp.MustCompile(`^\s*begin\s+`)
-var tdEndRegex = regexp.MustCompile(`^\s*end$`)
 var docExampleRegex = regexp.MustCompile(`^\s*//\s*Example:?.*`)
 
 type Args struct {

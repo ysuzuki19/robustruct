@@ -2,10 +2,15 @@ package process
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
+
+var tdRegex = regexp.MustCompile(`^\s*//\s*testdoc\s+`)
+var tdBeginRegex = regexp.MustCompile(`^\s*begin\s+`)
+var tdEndRegex = regexp.MustCompile(`^\s*end$`)
 
 type testDocOpening struct {
 	LineNo        int
