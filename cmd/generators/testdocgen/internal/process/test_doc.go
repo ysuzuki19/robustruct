@@ -54,8 +54,7 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 				default:
 					return nil, fmt.Errorf("testdoc begin line must contain either 'begin StructName' or 'begin StructName.FuncName'")
 				}
-			}
-			if _, ok := rest.MatchAndStrip(tdEndRegex); ok {
+			} else if _, ok := rest.MatchAndStrip(tdEndRegex); ok {
 				if begin, ok := opened.Take().Get(); ok {
 					tds = append(tds, TestDoc{
 						StructName: begin.StructureName,
@@ -66,6 +65,8 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 					return nil, fmt.Errorf("testdoc end found but not opened")
 				}
 			}
+		} else {
+			return nil, fmt.Errorf("testdoc line must start with '// testdoc begin' or '// testdoc end': %s", line)
 		}
 	}
 
