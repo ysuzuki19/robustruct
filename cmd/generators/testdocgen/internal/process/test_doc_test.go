@@ -37,7 +37,7 @@ func TestRegexps(t *testing.T) {
 	}
 }
 
-func TestParseTestDocs(t *testing.T) {
+func TestParseTestDocsNormal(t *testing.T) {
 	require := require.New(t)
 
 	test := `
@@ -73,4 +73,77 @@ func TestSampleMethod(t *testing.T) {
 			Content:    "\ts := Sample{}\n\trequire.Equal(1, s.Method())",
 		},
 	}, tds)
+}
+
+func TestParseTestDocsLines(t *testing.T) {
+	cases := []struct {
+		source string
+		isErr  bool
+	}{
+		{
+			source: `
+			`,
+			isErr: false,
+		},
+		{
+			source: `
+				// testdoc begin Utility
+				// testdoc end
+			`,
+			isErr: false,
+		},
+		{
+			source: `
+				// testdoc begin Sample.Method
+				// testdoc end
+			`,
+			isErr: false,
+		},
+		{
+			source: `
+				// testdoc begin Sample.
+				// testdoc end
+			`,
+			isErr: true,
+		},
+		{
+			source: `
+				// testdoc begin .Method
+				// testdoc end
+			`,
+			isErr: true,
+		},
+		{
+			source: `
+				// testdoc begin
+				// testdoc end
+			`,
+			isErr: true,
+		},
+		{
+			source: `
+				// testdoc begin Utility
+				// testdoc begin Utility
+				// testdoc end
+			`,
+			isErr: true,
+		},
+		{
+			source: `
+				// testdoc end
+			`,
+			isErr: true,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.source, func(t *testing.T) {
+			require := require.New(t)
+			_, err := ParseTestDocs(c.source)
+			if c.isErr {
+				require.Error(err)
+			} else {
+				require.NoError(err)
+			}
+		})
+	}
 }
