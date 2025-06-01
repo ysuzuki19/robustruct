@@ -64,9 +64,9 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 				} else {
 					return nil, fmt.Errorf("testdoc end found but not opened")
 				}
+			} else {
+				return nil, fmt.Errorf("testdoc line must start with '// testdoc begin' or '// testdoc end': %s", line)
 			}
-		} else {
-			return nil, fmt.Errorf("testdoc line must start with '// testdoc begin' or '// testdoc end': %s", line)
 		}
 	}
 
