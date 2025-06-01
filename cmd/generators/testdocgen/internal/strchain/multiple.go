@@ -55,3 +55,5 @@ func (m multiple) Join(sep string) single {
 func (m multiple) Collect() []string {
 	return m.ss
 }
+
+//go:generate go run ../../main.go -- -file=$GOFILE
