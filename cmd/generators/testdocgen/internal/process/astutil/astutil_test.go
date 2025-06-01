@@ -1,4 +1,4 @@
-package process
+package astutil_test
 
 import (
 	"go/ast"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/process/astutil"
 	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )
@@ -37,13 +38,26 @@ func (s *Sample[T]) GenericRefMethod() {}
 	file, err := parser.ParseFile(fset, "", source, parser.ParseComments)
 	require.NoError(err)
 
-	decls := ListFnDecls(file)
-	require.Len(decls, 5)
-	require.Equal("Utility", decls[0].Name.Name)
-	require.Equal("Method", decls[1].Name.Name)
-	require.Equal("RefMethod", decls[2].Name.Name)
-	require.Equal("GenericMethod", decls[3].Name.Name)
-	require.Equal("GenericRefMethod", decls[4].Name.Name)
+	funcs := astutil.ListFnDecls(fset, file)
+	require.Len(funcs, 5)
+
+	require.Equal("Utility", funcs[0].Name)
+	require.Equal(option.None[string](), funcs[0].Recv)
+
+	require.Equal("Method", funcs[1].Name)
+	require.Equal(option.NewSome("Sample"), funcs[1].Recv)
+
+	require.Equal("Method", funcs[1].Name)
+	require.Equal(option.NewSome("Sample"), funcs[1].Recv)
+
+	require.Equal("RefMethod", funcs[2].Name)
+	require.Equal(option.NewSome("Sample"), funcs[2].Recv)
+
+	require.Equal("GenericMethod", funcs[3].Name)
+	require.Equal(option.NewSome("Sample"), funcs[3].Recv)
+
+	require.Equal("GenericRefMethod", funcs[4].Name)
+	require.Equal(option.NewSome("Sample"), funcs[4].Recv)
 }
 
 func TestRecvTypeName(t *testing.T) {
@@ -89,7 +103,7 @@ func TestRecvTypeName(t *testing.T) {
 
 		fn, ok := file.Decls[0].(*ast.FuncDecl)
 		require.True(ok)
-		name := recvTypeName(fn)
+		name := astutil.RecvTypeName(fn)
 		require.Equal(c.receiver.UnwrapOrDefault(), name.UnwrapOrDefault())
 	}
 }

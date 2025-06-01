@@ -5,6 +5,7 @@ import (
 	"go/parser"
 	"go/token"
 
+	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/process/astutil"
 	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 )
 
@@ -19,20 +20,17 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 
 	for _, td := range tds {
 		planed := false
-		for _, fn := range ListFnDecls(file) {
-			if structName, ok := td.StructName.Get(); ok {
-				recvTypeName, ok := recvTypeName(fn).Get()
-				if !ok {
-					continue
-				}
-
-				if *recvTypeName != *structName {
-					continue
-				}
+		for _, fn := range astutil.ListFnDecls(fset, file) {
+			if td.StructName.IsSomeAnd(func(structName string) bool {
+				return fn.Recv.IsSomeAnd(func(recvTypeName string) bool {
+					return recvTypeName != structName
+				})
+			}) {
+				continue
 			}
 
-			if fn.Name.Name == td.FuncName {
-				insertLine, replaceCount, err := FindExamplePosition(fset, fn)
+			if fn.Name == td.FuncName {
+				insertLine, replaceCount, err := fn.ExamplePosition()
 				if err != nil {
 					return nil, fmt.Errorf("failed to find example range: %w", err)
 				}

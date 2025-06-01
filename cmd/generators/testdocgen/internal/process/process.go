@@ -2,19 +2,13 @@ package process
 
 import (
 	"fmt"
-	"go/ast"
-	"go/token"
 	"os"
-	"regexp"
 	"sort"
 
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/postgenerate"
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/writer"
 	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
-	"github.com/ysuzuki19/robustruct/pkg/option"
 )
-
-var docExampleRegex = regexp.MustCompile(`^\s*//\s*Example:?.*`)
 
 type Args struct {
 	CodePath string
@@ -41,37 +35,6 @@ type Plan struct {
 	InsertIndex  int
 	ReplaceCount int
 	Lines        []string
-}
-
-func FindExamplePosition(fset *token.FileSet, fn *ast.FuncDecl) (int, int, error) {
-	if fn.Doc == nil || len(fn.Doc.List) == 0 {
-		return fset.Position(fn.Pos()).Line - 1, 0, nil
-	}
-	begin := option.None[int]()
-	var searched int
-	for _, comment := range fn.Doc.List {
-		searched = fset.Position(comment.Pos()).Line
-		if begin.IsSome() {
-			// if exampleAnnotation.IsSome() {
-			// if comment.Text == "//" {
-			// 	if begin, ok := begin.Get(); ok {
-			// 		return *begin, searched, nil
-			// 	}
-			// } else {
-			// 	if begin.IsNone() {
-			// 		pos := fset.Position(comment.Pos())
-			// 		begin = option.NewSome(pos.Line)
-			// 	}
-			// }
-		} else if docExampleRegex.MatchString(comment.Text) {
-			begin = option.NewSome(searched - 1)
-		}
-	}
-	if exm, ok := begin.Get(); ok {
-		return *exm, searched - *exm, nil
-	}
-	// if `Example:` is not found, we return the last searched line as the end
-	return searched, 0, nil
 }
 
 func ApplyGoDoc(source string, plans []Plan) string {
