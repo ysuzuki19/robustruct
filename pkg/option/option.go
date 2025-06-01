@@ -60,9 +60,12 @@ type OptionFactory[T any] func() Option[T]
 //
 // Example:
 //
-//	val := 42
-//	opt := option.Some(&val)
-//	fmt.Println(opt.IsSome()) // Output: true
+//	v := 1
+//	o := option.Some(&v)
+//	require.True(o.IsSome())
+//	require.Equal(&v, o.Ptr())
+//	v = 2
+//	require.Equal(2, *o.Ptr())
 func Some[T any](v *T) Option[T] {
 	return Option[T]{ptr: v}
 }
@@ -71,8 +74,9 @@ func Some[T any](v *T) Option[T] {
 //
 // Example:
 //
-//	opt := option.NewSome(42)
-//	fmt.Println(opt.IsSome()) // Output: true
+//	o := option.NewSome(1)
+//	require.True(o.IsSome())
+//	require.Equal(1, *o.Ptr())
 func NewSome[T any](v T) Option[T] {
 	return Some(&v)
 }
@@ -81,8 +85,9 @@ func NewSome[T any](v T) Option[T] {
 //
 // Example:
 //
-//	opt := option.None[int]()
-//	fmt.Println(opt.IsNone()) // Output: true
+//	o := option.None[int]()
+//	require.True(o.IsNone())
+//	require.Nil(o.Ptr())
 func None[T any]() Option[T] {
 	return Option[T]{ptr: nil}
 }
@@ -118,14 +123,24 @@ func (o Option[T]) Ptr() *T {
 }
 
 // Get returns the contained value and a boolean indicating whether the Option is Some.
-//
-// Example:
+// Usecase:
 //
 //	if v, ok := opt.Get(); ok {
 //		// something with `v`
 //	} else {
 //		// fallback without `v`
 //	}
+//
+// Example:
+//
+//	v := 1
+//	ptr, isSome := option.Some(&v).Get()
+//	require.True(isSome)
+//	require.Equal(&v, ptr)
+//
+//	ptr, isSome = option.None[int]().Get()
+//	require.False(isSome)
+//	require.Nil(ptr)
 func (o Option[T]) Get() (*T, bool) {
 	return o.ptr, o.IsSome()
 }
@@ -211,14 +226,6 @@ func (o Option[T]) Filter(f Check[*T]) Option[T] {
 //	x = option.None[int]()
 //	y = option.NewSome(3)
 //	require.Equal(x.Or(y), y)
-//
-//	x = option.NewSome(2)
-//	y = option.NewSome(3)
-//	require.Equal(x.Or(y), x)
-//
-//	x = option.None[int]()
-//	y = option.None[int]()
-//	require.Equal(x.Or(y), y)
 func (o Option[T]) Or(optb Option[T]) Option[T] {
 	if o.IsSome() {
 		return o
@@ -265,18 +272,10 @@ func (o Option[T]) Xor(optb Option[T]) Option[T] {
 //
 // Example:
 //
-//	{
-//		v := o.Insert(1)
-//		require.Equal(o.Ptr(), v)
-//		require.Equal(1, *v)
-//		require.Equal(1, *o.Ptr())
-//	}
-//	{
-//		v := o.Insert(2)
-//		require.Equal(2, *v)
-//		*v = 3
-//		require.Equal(3, *o.Ptr())
-//	}
+//	v := o.Insert(1)
+//	require.Equal(o.Ptr(), v)
+//	require.Equal(1, *v)
+//	require.Equal(1, *o.Ptr())
 func (o *Option[T]) Insert(v T) *T {
 	o.ptr = &v
 	return o.ptr
@@ -286,13 +285,9 @@ func (o *Option[T]) Insert(v T) *T {
 //
 // Example:
 //
-//	o := option.None[int]()
-//	{
-//		v := o.GetOrInsert(1)
-//		require.Equal(1, *v)
-//		*v = 7
-//	}
-//	require.Equal(option.NewSome(7), o)
+//	v := o.GetOrInsert(1)
+//	require.Equal(1, *v)
+//	*v = 7
 func (o *Option[T]) GetOrInsert(v T) *T {
 	if o.IsNone() {
 		o.ptr = &v
@@ -305,13 +300,9 @@ func (o *Option[T]) GetOrInsert(v T) *T {
 //
 // Example:
 //
-//	o := option.None[int]()
-//	{
-//		v := o.GetOrInsertDefault()
-//		require.Equal(0, *v)
-//		*v = 7
-//	}
-//	require.Equal(option.NewSome(7), o)
+//	v := o.GetOrInsertDefault()
+//	require.Equal(0, *v)
+//	*v = 7
 func (o *Option[T]) GetOrInsertDefault() *T {
 	var v T // set zero value
 	return o.GetOrInsert(v)
@@ -359,19 +350,16 @@ func (o *Option[T]) Take() Option[T] {
 //
 // Example:
 //
-//	o := option.NewSome(2)
-//	{
-//		prev := o.TakeIf(func(x *int) bool {
-//			if *x == 2 {
-//				*x += 1
-//				return false
-//			} else {
-//				return false
-//			}
-//		})
-//		require.Equal(option.NewSome(3), o)
-//		require.Equal(option.None[int](), prev)
-//	}
+//	prev := o.TakeIf(func(x *int) bool {
+//		if *x == 2 {
+//			*x += 1
+//			return false
+//		} else {
+//			return false
+//		}
+//	})
+//	require.Equal(option.NewSome(3), o)
+//	require.Equal(option.None[int](), prev)
 func (o *Option[T]) TakeIf(predicate Check[*T]) Option[T] {
 	if o.IsNone() {
 		return None[T]()
@@ -416,3 +404,6 @@ func (o Option[T]) Clone() Option[T] {
 	copied := *o.ptr // copy current value
 	return Some(&copied)
 }
+
+//go:generate go run ../../cmd/generators/testdocgen/main.go -- -file=$GOFILE
+//TODO go:generate go run github.com/ysuzuki19/robustruct@feature/testdocgen/cmd/generators/testdocgen/main.go -- -file=$GOFILE
