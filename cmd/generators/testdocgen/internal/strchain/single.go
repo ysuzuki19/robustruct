@@ -1,6 +1,9 @@
 package strchain
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 type single struct {
 	s string
@@ -43,6 +46,35 @@ func (s single) TrimSpace() single {
 func (s single) Replace(old, new string, n int) single {
 	s.s = strings.Replace(s.s, old, new, n)
 	return s
+}
+
+// Match returns true if the string matches the regular expression.
+//
+// Example:
+//
+//	s := strchain.From("testing")
+//	re := regexp.MustCompile("^test")
+//	require.True(s.Match(re))
+func (s single) Match(re *regexp.Regexp) bool {
+	return re.MatchString(s.s)
+}
+
+// MatchAndStrip returns a new single with the matched substring removed.
+//
+// Example:
+//
+//	s := strchain.From("testing")
+//	re := regexp.MustCompile("^test")
+//	m, ok := s.MatchAndStrip(re)
+//	require.True(ok)
+//	require.Equal("ing", m.String())
+func (s single) MatchAndStrip(re *regexp.Regexp) (single, bool) {
+	loc := re.FindStringIndex(s.s)
+	if loc == nil {
+		return s, false
+	}
+	s.s = s.s[:loc[0]] + s.s[loc[1]:]
+	return s, true
 }
 
 // Split returns a multiple containing the substrings of the string

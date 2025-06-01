@@ -1,6 +1,7 @@
 package strchain_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -31,6 +32,26 @@ func TestReplace(t *testing.T) {
 	s := strchain.From("testing")
 	s = s.Replace("t", "T", 1)
 	require.Equal("Testing", s.String())
+	// testdoc end
+}
+
+func TestMatch(t *testing.T) {
+	require := require.New(t)
+	// testdoc begin single.Match
+	s := strchain.From("testing")
+	re := regexp.MustCompile("^test")
+	require.True(s.Match(re))
+	// testdoc end
+}
+
+func TestMainchAndStrip(t *testing.T) {
+	require := require.New(t)
+	// testdoc begin single.MatchAndStrip
+	s := strchain.From("testing")
+	re := regexp.MustCompile("^test")
+	m, ok := s.MatchAndStrip(re)
+	require.True(ok)
+	require.Equal("ing", m.String())
 	// testdoc end
 }
 
