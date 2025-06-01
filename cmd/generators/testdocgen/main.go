@@ -47,7 +47,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error getting absolute path: %v", err)
 	}
-	fmt.Println("Absolute path:", codePath)
 
 	if err := engine.Run(engine.Args{
 		CodePath: codePath,
