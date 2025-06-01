@@ -38,7 +38,7 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 			}
 
 			if fn.Name.Name == td.FuncName {
-				insertLine, replaceCount, err := FindExamplePosition(fset, fn.Doc.List)
+				insertLine, replaceCount, err := FindExamplePosition(fset, fn)
 				if err != nil {
 					return nil, fmt.Errorf("failed to find example range: %w", err)
 				}

@@ -45,10 +45,13 @@ type Plan struct {
 	Lines        []string
 }
 
-func FindExamplePosition(fset *token.FileSet, docList []*ast.Comment) (int, int, error) {
+func FindExamplePosition(fset *token.FileSet, fn *ast.FuncDecl) (int, int, error) {
+	if fn.Doc == nil || len(fn.Doc.List) == 0 {
+		return fset.Position(fn.Pos()).Line - 1, 0, nil
+	}
 	begin := option.None[int]()
 	var searched int
-	for _, comment := range docList {
+	for _, comment := range fn.Doc.List {
 		searched = fset.Position(comment.Pos()).Line
 		if begin.IsSome() {
 			// if exampleAnnotation.IsSome() {
