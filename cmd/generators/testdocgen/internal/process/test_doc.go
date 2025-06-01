@@ -24,13 +24,13 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 	var tds []TestDoc
 	opened := option.None[testDocOpening]()
 
-	for idx, line := range lines.Collect() {
-		if rest, ok := matchAndStrip(tdRegex, line); ok {
-			if rest, ok := matchAndStrip(tdBeginRegex, rest); ok {
+	for idx, line := range lines.Entries() {
+		if rest, ok := line.MatchAndStrip(tdRegex); ok {
+			if rest, ok := rest.MatchAndStrip(tdBeginRegex); ok {
 				if opened.IsSome() {
 					return nil, fmt.Errorf("testdoc begin found but already opened at line %v", opened.Ptr().LineNo)
 				}
-				parts := strchain.From(rest).TrimSpace().Split(".").Collect()
+				parts := rest.TrimSpace().Split(".").Collect()
 				switch len(parts) {
 				case 1:
 					opened = option.NewSome(
@@ -50,7 +50,7 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 					return nil, fmt.Errorf("testdoc begin line must contain either 'begin StructName' or 'begin StructName.FuncName'")
 				}
 			}
-			if _, ok := matchAndStrip(tdEndRegex, rest); ok {
+			if _, ok := rest.MatchAndStrip(tdEndRegex); ok {
 				if begin, ok := opened.Take().Get(); ok {
 					tds = append(tds, TestDoc{
 						StructName: begin.StructureName,

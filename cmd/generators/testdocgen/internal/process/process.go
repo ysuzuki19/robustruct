@@ -17,6 +17,7 @@ import (
 var tdRegex = regexp.MustCompile(`^\s*//\s*testdoc\s+`)
 var tdBeginRegex = regexp.MustCompile(`^\s*begin\s+`)
 var tdEndRegex = regexp.MustCompile(`^\s*end$`)
+var docExampleRegex = regexp.MustCompile(`^\s*//\s*Example:?.*`)
 
 type Args struct {
 	CodePath string
@@ -65,7 +66,7 @@ func FindExamplePosition(fset *token.FileSet, fn *ast.FuncDecl) (int, int, error
 			// 		begin = option.NewSome(pos.Line)
 			// 	}
 			// }
-		} else if regexp.MustCompile(`^\s*//\s*Example:?.*`).MatchString(comment.Text) {
+		} else if docExampleRegex.MatchString(comment.Text) {
 			begin = option.NewSome(searched - 1)
 		}
 	}
@@ -131,12 +132,4 @@ func Process(args Args) error {
 	}
 
 	return nil
-}
-
-func matchAndStrip(re *regexp.Regexp, input string) (string, bool) {
-	loc := re.FindStringIndex(input)
-	if loc == nil {
-		return input, false
-	}
-	return input[:loc[0]] + input[loc[1]:], true
 }
