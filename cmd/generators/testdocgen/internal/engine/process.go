@@ -1,4 +1,4 @@
-package process
+package engine
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ type Args struct {
 	Writer   writer.Writer
 }
 
-func Process(args Args) error {
+func Run(args Args) error {
 	source, test, err := LoadFilePair(args.CodePath)
 	if err != nil {
 		return fmt.Errorf("failed to load file pair: %w", err)

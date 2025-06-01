@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/ysuzuki19/robustruct/cmd/generators/internal/writer"
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/process"
+	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/engine"
 )
 
 type Args struct {
@@ -49,7 +49,7 @@ func main() {
 	}
 	fmt.Println("Absolute path:", codePath)
 
-	if err := process.Process(process.Args{
+	if err := engine.Run(engine.Args{
 		CodePath: codePath,
 		// Writer: &writer.MemoryWriter{
 		// 	Content: "",

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/process/astutil"
+	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/engine/astutil"
 	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 	"github.com/ysuzuki19/robustruct/pkg/option"
 )

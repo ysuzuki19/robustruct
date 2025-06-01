@@ -1,11 +1,11 @@
-package process
+package engine
 
 import (
 	"fmt"
 	"go/parser"
 	"go/token"
 
-	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/process/astutil"
+	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/engine/astutil"
 	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 )
 
