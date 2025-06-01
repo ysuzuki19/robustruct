@@ -9,6 +9,12 @@ import (
 	"github.com/ysuzuki19/robustruct/cmd/generators/testdocgen/internal/strchain"
 )
 
+type Plan struct {
+	InsertIndex  int
+	ReplaceCount int
+	Lines        []string
+}
+
 func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 	fset := token.NewFileSet()
 	file, err := parser.ParseFile(fset, "", source, parser.ParseComments)
