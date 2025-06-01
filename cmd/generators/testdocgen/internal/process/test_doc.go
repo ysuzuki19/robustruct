@@ -38,6 +38,9 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 				parts := rest.TrimSpace().Split(".").Collect()
 				switch len(parts) {
 				case 1:
+					if parts[0] == "" {
+						return nil, fmt.Errorf("testdoc begin line must contain either 'begin StructName' or 'begin StructName.FuncName'")
+					}
 					opened = option.NewSome(
 						testDocOpening{
 							LineNo:        idx,
@@ -45,6 +48,9 @@ func ParseTestDocs(test string) ([]TestDoc, error) {
 							FuncName:      parts[0],
 						})
 				case 2:
+					if parts[0] == "" || parts[1] == "" {
+						return nil, fmt.Errorf("testdoc begin line must contain either 'begin StructName' or 'begin StructName.FuncName'")
+					}
 					opened = option.NewSome(
 						testDocOpening{
 							LineNo:        idx,
