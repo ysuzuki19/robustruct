@@ -27,11 +27,10 @@ func PlanGoDoc(source string, tds []TestDoc) ([]Plan, error) {
 	for _, td := range tds {
 		planed := false
 		for _, fn := range astutil.ListFnDecls(fset, file) {
-			if td.StructName.IsSomeAnd(func(structName string) bool {
-				return fn.Recv.IsSomeAnd(func(recvTypeName string) bool {
-					return recvTypeName != structName
-				})
-			}) {
+			if fn.Recv.UnwrapOrDefault() != td.StructName.UnwrapOrDefault() {
+				// None and Some => unmatched
+				// Some and None => unmatched
+				// Some and Some => check equality
 				continue
 			}
 
