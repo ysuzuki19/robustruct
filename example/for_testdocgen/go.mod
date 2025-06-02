@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	github.com/stretchr/testify v1.10.0
-	github.com/ysuzuki19/robustruct v0.3.1
+	github.com/ysuzuki19/robustruct v0.3.4
 )
 
 require (

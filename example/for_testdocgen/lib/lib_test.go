@@ -23,7 +23,7 @@ func TestNewUser(t *testing.T) {
 func TestGetName(t *testing.T) {
 	require := require.New(t)
 
-	// testdoc begin GetName
+	// testdoc begin User.GetName
 	u := lib.NewUser("Alice", 30)
 	require.Equal("Alice", u.GetName())
 	// testdoc end
@@ -32,7 +32,7 @@ func TestGetName(t *testing.T) {
 func TestGetAge(t *testing.T) {
 	require := require.New(t)
 
-	// testdoc begin GetAge
+	// testdoc begin User.GetAge
 	u := lib.NewUser("Alice", 30)
 	require.Equal(30, u.GetAge())
 	// testdoc end
@@ -41,7 +41,7 @@ func TestGetAge(t *testing.T) {
 func TestSetName(t *testing.T) {
 	require := require.New(t)
 
-	// testdoc begin SetName
+	// testdoc begin User.SetName
 	u := lib.NewUser("Alice", 30)
 	u.SetName("Bob")
 	require.Equal("Bob", u.GetName())
@@ -51,7 +51,7 @@ func TestSetName(t *testing.T) {
 func TestSetAge(t *testing.T) {
 	require := require.New(t)
 
-	// testdoc begin SetAge
+	// testdoc begin User.SetAge
 	u := lib.NewUser("Alice", 30)
 	u.SetAge(40)
 	require.Equal(40, u.GetAge())
