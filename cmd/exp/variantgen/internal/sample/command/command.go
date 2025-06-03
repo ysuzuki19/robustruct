@@ -5,7 +5,7 @@ import (
 	"github.com/ysuzuki19/robustruct/cmd/exp/variantgen/types"
 )
 
-//go:generate go run /home/yuya/Github/robustruct/cmd/exp/variantgen/main.go
+//go:generate go run ../../../main.go
 type command struct {
 	help  types.NonVar
 	run   *string

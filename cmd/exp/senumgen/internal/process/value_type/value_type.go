@@ -1,6 +1,6 @@
 package value_type
 
-//go:generate go run /home/yuya/Github/robustruct/cmd/exp/senumgen/main.go
+//go:generate go run ../../../main.go
 /*
 $.name=ValueType
 $.value_type=string
