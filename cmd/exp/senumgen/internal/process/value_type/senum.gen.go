@@ -6,7 +6,7 @@ import "fmt"
 type ValueType int
 
 const (
-	zero   ValueType = 0
+	zero   ValueType = 0 // zero value catcher
 	String ValueType = iota
 	Int    ValueType = iota
 )

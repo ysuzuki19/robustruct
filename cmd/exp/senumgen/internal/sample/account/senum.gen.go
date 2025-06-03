@@ -6,7 +6,7 @@ import "fmt"
 type Account int
 
 const (
-	zero  Account = 0
+	zero  Account = 0 // zero value catcher
 	Admin Account = iota
 	User  Account = iota
 	Guest Account = iota
