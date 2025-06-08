@@ -13,7 +13,7 @@ Go tool for struct robustness.
 
 ## Generators
 
-### testdocgen ([README](pkg/testdocgen/README.md))
+### testdocgen ([README](cmd/gen/testdocgen/README.md))
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/ysuzuki19/robustruct/cmd/gen/testdocgen.svg)](https://pkg.go.dev/github.com/ysuzuki19/robustruct/cmd/gen/testdocgen)
 
