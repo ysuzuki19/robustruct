@@ -5,6 +5,7 @@ import (
 
 	"github.com/golangci/plugin-module-register/register"
 
+	"github.com/ysuzuki19/robustruct/pkg/linters/const_group_switch_cover"
 	"github.com/ysuzuki19/robustruct/pkg/linters/fields_align"
 	"github.com/ysuzuki19/robustruct/pkg/linters/fields_require"
 	"github.com/ysuzuki19/robustruct/pkg/linters/robustruct/settings"
@@ -39,6 +40,8 @@ func (pr *PluginRobustruct) BuildAnalyzers() ([]*analysis.Analyzer, error) {
 			analyzers = append(analyzers, fields_require.Factory(pr.settings.Flags))
 		case settings.FeatureFieldsAlign:
 			analyzers = append(analyzers, fields_align.Factory(pr.settings.Flags))
+		case settings.FeatureConstGroupSwitchCover:
+			analyzers = append(analyzers, const_group_switch_cover.Analyzer)
 		}
 	}
 	return analyzers, nil

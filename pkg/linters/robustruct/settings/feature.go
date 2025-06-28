@@ -3,8 +3,9 @@ package settings
 type Feature string
 
 const (
-	FeatureFieldsRequire Feature = "fields_require"
-	FeatureFieldsAlign   Feature = "fields_align"
+	FeatureFieldsRequire         Feature = "fields_require"
+	FeatureFieldsAlign           Feature = "fields_align"
+	FeatureConstGroupSwitchCover Feature = "const_group_switch_cover"
 )
 
 func (f Feature) String() string { return string(f) }
