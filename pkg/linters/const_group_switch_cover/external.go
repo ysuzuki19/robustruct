@@ -1,9 +1,6 @@
 package const_group_switch_cover
 
 import (
-	"fmt"
-	"go/ast"
-	"go/token"
 	"go/types"
 
 	"golang.org/x/tools/go/analysis"
@@ -11,19 +8,14 @@ import (
 	"github.com/ysuzuki19/robustruct/internal/logger"
 )
 
-func runExternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bodyList []ast.Stmt) {
-	info := pass.TypesInfo
-
-	var consts []*types.Const
+func runExternal(pass *analysis.Pass, namedType *types.Named) (consts []*types.Const) {
 	typeName := namedType.Obj().Name()
-	logger.Debug("Named type found:", typeName)
 	pkgName := namedType.Obj().Pkg().Name()
-	logger.Debug("Package name:", pkgName)
 
 	tagTypePkg := findImport(pass, pkgName)
 	if tagTypePkg == nil {
 		logger.Debug("No import found for package:", pkgName)
-		return
+		return nil
 	}
 	tagTypeScope := tagTypePkg.Scope()
 
@@ -48,53 +40,9 @@ func runExternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bod
 
 	if len(consts) == 0 {
 		logger.Debug("No constants found for type:", tagType)
-		return
+		return nil
 	}
 	logger.Debug("Constants found:", len(consts))
 
-	cases := []types.Type{}
-	for _, stmt := range bodyList {
-		caseStmt, ok := stmt.(*ast.CaseClause)
-		if !ok || len(caseStmt.List) == 0 {
-			continue
-		}
-
-		for _, expr := range caseStmt.List {
-			if isHardCoded(expr) {
-				logger.Debug("Hard-coded expression found:", expr)
-				pass.Report(analysis.Diagnostic{
-					Pos:            pos,
-					End:            0,
-					Category:       "",
-					Message:        "robustruct/linters/switch_case_cover: case value requires type related const value",
-					URL:            "",
-					SuggestedFixes: []analysis.SuggestedFix{},
-					Related:        []analysis.RelatedInformation{},
-				})
-				return
-			}
-
-			caseType := info.Types[expr].Type
-			if caseType == nil {
-				fmt.Println("No type found for expression:", expr)
-				return
-			}
-
-			logger.Debug("Case expression type:", caseType.String())
-			cases = append(cases, caseType)
-		}
-	}
-	logger.Debug("Cases found:", len(cases))
-
-	if len(consts) != len(cases) {
-		pass.Report(analysis.Diagnostic{
-			Pos:            pos,
-			End:            0,
-			Category:       "",
-			Message:        "robustruct/linters/switch_case_cover: case body uncovered grouped const value",
-			URL:            "",
-			SuggestedFixes: []analysis.SuggestedFix{},
-			Related:        []analysis.RelatedInformation{},
-		})
-	}
+	return consts
 }

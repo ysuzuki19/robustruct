@@ -1,9 +1,6 @@
 package const_group_switch_cover
 
 import (
-	"fmt"
-	"go/ast"
-	"go/token"
 	"go/types"
 
 	"golang.org/x/tools/go/analysis"
@@ -11,7 +8,7 @@ import (
 	"github.com/ysuzuki19/robustruct/internal/logger"
 )
 
-func runInternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bodyList []ast.Stmt) {
+func runInternal(pass *analysis.Pass, namedType *types.Named) (consts []*types.Const) {
 	info := pass.TypesInfo
 	name := namedType.Obj().Name()
 	var tagType types.Type
@@ -22,70 +19,24 @@ func runInternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bod
 		}
 	}
 	if tagType == nil {
-		fmt.Println("No matching type found for:", name)
-		return
+		logger.Debug("No matching type found for:", name)
+		return nil
 	}
 
-	var consts []*types.Const
 	for _, obj := range info.Defs {
 		if obj == nil {
 			continue
 		}
 
-		// Check if the object is a constant and matches the detected type
 		if c, ok := obj.(*types.Const); ok && types.Identical(c.Type(), tagType) {
 			consts = append(consts, c)
 		}
 	}
 	if len(consts) == 0 {
-		fmt.Println("No constants found for type:", tagType)
-		return
+		logger.Debug("No constants found for type:", tagType)
+		return nil
 	}
-	fmt.Println("Constants found:", len(consts))
+	logger.Debug("Constants found:", len(consts))
 
-	cases := []types.Type{}
-	for _, stmt := range bodyList {
-		caseStmt, ok := stmt.(*ast.CaseClause)
-		if !ok || len(caseStmt.List) == 0 {
-			continue
-		}
-
-		for _, expr := range caseStmt.List {
-			if isHardCoded(expr) {
-				logger.Debug("Hard-coded expression found:", expr)
-				pass.Report(analysis.Diagnostic{
-					Pos:            pos,
-					End:            0,
-					Category:       "",
-					Message:        "robustruct/linters/switch_case_cover: case value requires type related const value",
-					URL:            "",
-					SuggestedFixes: []analysis.SuggestedFix{},
-					Related:        []analysis.RelatedInformation{},
-				})
-				return
-			}
-
-			caseType := info.Types[expr].Type
-			if caseType == nil {
-				logger.Debug("No type found for expression:", expr)
-				continue
-			}
-
-			logger.Debug("Case expression type:", caseType)
-			cases = append(cases, caseType)
-		}
-	}
-	fmt.Println("Cases found:", len(cases))
-
-	if len(consts) != len(cases) {
-		pass.Report(analysis.Diagnostic{
-			Pos:            pos,
-			End:            0,
-			Category:       "",
-			Message:        "robustruct/linters/switch_case_cover: case body uncovered grouped const value",
-			URL:            "",
-			SuggestedFixes: []analysis.SuggestedFix{},
-			Related:        []analysis.RelatedInformation{},
-		})
-	}
+	return consts
 }
