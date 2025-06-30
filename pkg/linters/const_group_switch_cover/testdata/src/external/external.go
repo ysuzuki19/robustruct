@@ -25,3 +25,16 @@ func LackedSwitch(xyz sub.XYZ) string {
 		return "unknown"
 	}
 }
+
+func HardCoded(xyz sub.XYZ) string {
+	switch xyz { // want "robustruct/linters/switch_case_cover: case value requires type related const value"
+	case sub.X:
+		return "X"
+	case 1: // hard-coded value
+		return "1"
+	case sub.Z:
+		return "Z"
+	default:
+		return "unknown"
+	}
+}

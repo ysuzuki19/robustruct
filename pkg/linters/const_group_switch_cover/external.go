@@ -60,6 +60,20 @@ func runExternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bod
 		}
 
 		for _, expr := range caseStmt.List {
+			if isHardCoded(expr) {
+				logger.Debug("Hard-coded expression found:", expr)
+				pass.Report(analysis.Diagnostic{
+					Pos:            pos,
+					End:            0,
+					Category:       "",
+					Message:        "robustruct/linters/switch_case_cover: case value requires type related const value",
+					URL:            "",
+					SuggestedFixes: []analysis.SuggestedFix{},
+					Related:        []analysis.RelatedInformation{},
+				})
+				return
+			}
+
 			caseType := info.Types[expr].Type
 			if caseType == nil {
 				fmt.Println("No type found for expression:", expr)
