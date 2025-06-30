@@ -1,0 +1,11 @@
+[meta]
+version = "0.1.0"
+
+[job."test:pkg:linters:const_group_switch_cover"]
+command = "go"
+args = ["test", "./pkg/linters/const_group_switch_cover/"]
+
+[job."test:pkg:linters:const_group_switch_cover:live"]
+mode = "watch"
+job = "test:pkg:linters:const_group_switch_cover"
+watch_list = ["**/*.go"]
