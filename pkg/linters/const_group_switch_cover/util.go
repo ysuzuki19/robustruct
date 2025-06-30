@@ -1,6 +1,7 @@
 package const_group_switch_cover
 
 import (
+	"go/ast"
 	"go/types"
 
 	"golang.org/x/tools/go/analysis"
@@ -29,4 +30,19 @@ func typeEqual(a, b types.Type) bool {
 		}
 	}
 	return false
+}
+
+func isHardCoded(expr ast.Expr) bool {
+	switch e := expr.(type) {
+	case *ast.BasicLit:
+		return true
+	case *ast.ParenExpr:
+		return isHardCoded(e.X)
+	case *ast.UnaryExpr:
+		return isHardCoded(e.X)
+	case *ast.BinaryExpr:
+		return isHardCoded(e.X) && isHardCoded(e.Y)
+	default:
+		return false
+	}
 }

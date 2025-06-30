@@ -35,7 +35,7 @@ func MultipleCase(r Role) {
 }
 
 func InvalidCase(r Role) {
-	switch r { // want "robustruct/linters/switch_case_cover: case body requires const value"
+	switch r { // want "robustruct/linters/switch_case_cover: case value requires type related const value"
 	case "admin":
 		// Handle admin role
 	case "user":

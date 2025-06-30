@@ -38,7 +38,7 @@ func MultipleCase(ll LogLevel) string {
 }
 
 func InvalidCase(ll LogLevel) string {
-	switch ll { // want "robustruct/linters/switch_case_cover: case body requires const value"
+	switch ll { // want "robustruct/linters/switch_case_cover: case value requires type related const value"
 	case 0:
 		return "debug"
 	case 1:

@@ -6,6 +6,8 @@ import (
 	"go/types"
 
 	"golang.org/x/tools/go/analysis"
+
+	"github.com/ysuzuki19/robustruct/internal/logger"
 )
 
 func runInternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named) {
@@ -40,32 +42,47 @@ func runInternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named
 	}
 	fmt.Println("Constants found:", len(consts))
 
-	cases := []string{}
+	cases := []types.Type{}
 	for _, stmt := range ss.Body.List {
-		// Check if the case statement is a full arm
 		caseStmt, ok := stmt.(*ast.CaseClause)
 		if !ok || len(caseStmt.List) == 0 {
 			continue
 		}
 
-		for _, expr := range caseStmt.List {
-			// Check if the expression is an identifier that matches the constant group
-			if ident, ok := expr.(*ast.Ident); ok {
-				cases = append(cases, ident.Name)
-			} else {
-				// If it's not an identifier, we can skip it for now
-				fmt.Println("Non-identifier case expression found:", expr)
+		for ident, expr := range caseStmt.List {
+			if isHardCoded(expr) {
+				logger.Debug("Hard-coded expression found:", expr)
 				pass.Report(analysis.Diagnostic{
 					Pos:            ss.Pos(),
 					End:            0,
 					Category:       "",
-					Message:        "robustruct/linters/switch_case_cover: case body requires const value",
+					Message:        "robustruct/linters/switch_case_cover: case value requires type related const value",
 					URL:            "",
 					SuggestedFixes: []analysis.SuggestedFix{},
 					Related:        []analysis.RelatedInformation{},
 				})
 				return
 			}
+
+			logger.Debug("Processing case ident:", ident)
+			logger.Debug("Processing case expression:", expr)
+			caseType := info.Types[expr].Type
+			logger.Debug("Case expression type:", caseType)
+
+			if !typeEqual(caseType, tagType) {
+				pass.Report(analysis.Diagnostic{
+					Pos:            ss.Pos(),
+					End:            0,
+					Category:       "",
+					Message:        "robustruct/linters/switch_case_cover: case value requires type related const value",
+					URL:            "",
+					SuggestedFixes: []analysis.SuggestedFix{},
+					Related:        []analysis.RelatedInformation{},
+				})
+				return
+			}
+
+			cases = append(cases, caseType)
 		}
 	}
 	fmt.Println("Cases found:", len(cases))
