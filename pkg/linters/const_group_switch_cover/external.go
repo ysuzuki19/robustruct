@@ -38,7 +38,7 @@ func runExternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named
 		if c, ok := obj.(*types.Const); ok {
 			typeString := c.Type().String()
 			logger.Debug("Constant type string:", typeString)
-			if TypeEqual(c.Type(), tagType) {
+			if typeEqual(c.Type(), tagType) {
 				logger.Debug("Matching constant found:", c.Type().String())
 				consts = append(consts, c)
 			}
@@ -69,7 +69,7 @@ func runExternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named
 				return
 			}
 
-			if !TypeEqual(caseType, tagType) {
+			if !typeEqual(caseType, tagType) {
 				pass.Report(analysis.Diagnostic{
 					Pos:            ss.Pos(),
 					End:            0,
