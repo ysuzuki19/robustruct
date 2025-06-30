@@ -50,7 +50,7 @@ func runInternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bod
 			continue
 		}
 
-		for ident, expr := range caseStmt.List {
+		for _, expr := range caseStmt.List {
 			if isHardCoded(expr) {
 				logger.Debug("Hard-coded expression found:", expr)
 				pass.Report(analysis.Diagnostic{
@@ -65,11 +65,13 @@ func runInternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bod
 				return
 			}
 
-			logger.Debug("Processing case ident:", ident)
-			logger.Debug("Processing case expression:", expr)
 			caseType := info.Types[expr].Type
-			logger.Debug("Case expression type:", caseType)
+			if caseType == nil {
+				logger.Debug("No type found for expression:", expr)
+				continue
+			}
 
+			logger.Debug("Case expression type:", caseType)
 			cases = append(cases, caseType)
 		}
 	}
