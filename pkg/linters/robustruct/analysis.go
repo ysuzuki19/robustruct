@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/tools/go/analysis"
 
+	"github.com/ysuzuki19/robustruct/pkg/linters/const_group_switch_cover"
 	"github.com/ysuzuki19/robustruct/pkg/linters/fields_align"
 	"github.com/ysuzuki19/robustruct/pkg/linters/fields_require"
 	"github.com/ysuzuki19/robustruct/pkg/linters/robustruct/settings"
@@ -13,6 +14,7 @@ import (
 var FeatureAnalyzers = []*analysis.Analyzer{
 	fields_require.Analyzer,
 	fields_align.Analyzer,
+	const_group_switch_cover.Analyzer,
 }
 
 var Analyzer = &analysis.Analyzer{
