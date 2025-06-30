@@ -70,19 +70,6 @@ func runInternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bod
 			caseType := info.Types[expr].Type
 			logger.Debug("Case expression type:", caseType)
 
-			if !typeEqual(caseType, tagType) {
-				pass.Report(analysis.Diagnostic{
-					Pos:            pos,
-					End:            0,
-					Category:       "",
-					Message:        "robustruct/linters/switch_case_cover: case value requires type related const value",
-					URL:            "",
-					SuggestedFixes: []analysis.SuggestedFix{},
-					Related:        []analysis.RelatedInformation{},
-				})
-				return
-			}
-
 			cases = append(cases, caseType)
 		}
 	}

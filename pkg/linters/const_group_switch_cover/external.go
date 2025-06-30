@@ -80,19 +80,6 @@ func runExternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bod
 				return
 			}
 
-			if !typeEqual(caseType, tagType) {
-				pass.Report(analysis.Diagnostic{
-					Pos:            pos,
-					End:            0,
-					Category:       "",
-					Message:        "robustruct/linters/switch_case_cover: case value requires type related const value",
-					URL:            "",
-					SuggestedFixes: []analysis.SuggestedFix{},
-					Related:        []analysis.RelatedInformation{},
-				})
-				return
-			}
-
 			logger.Debug("Case expression type:", caseType.String())
 			cases = append(cases, caseType)
 		}
