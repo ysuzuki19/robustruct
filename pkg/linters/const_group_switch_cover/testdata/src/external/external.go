@@ -2,14 +2,6 @@ package external
 
 import "external/sub"
 
-type Dummy int
-
-const (
-	A Dummy = iota
-	B
-	C
-)
-
 func EnoughSwitch(xyz sub.XYZ) string {
 	switch xyz {
 	case sub.X:
