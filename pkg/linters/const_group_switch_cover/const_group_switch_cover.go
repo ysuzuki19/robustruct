@@ -89,9 +89,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				isInternal := namedType.Obj().Pkg().Path() == pass.Pkg.Path()
 				var consts []*types.Const
 				if isInternal {
-					consts = runInternal(pass, namedType)
+					consts = findConstsInternaly(pass, namedType)
 				} else {
-					consts = runExternal(pass, namedType)
+					consts = findConstsExternaly(pass, namedType)
 				}
 
 				if len(consts) != len(cases) {

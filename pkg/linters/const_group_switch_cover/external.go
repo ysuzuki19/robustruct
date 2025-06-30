@@ -8,7 +8,7 @@ import (
 	"github.com/ysuzuki19/robustruct/internal/logger"
 )
 
-func runExternal(pass *analysis.Pass, namedType *types.Named) (consts []*types.Const) {
+func findConstsExternaly(pass *analysis.Pass, namedType *types.Named) (consts []*types.Const) {
 	typeName := namedType.Obj().Name()
 	pkgName := namedType.Obj().Pkg().Name()
 

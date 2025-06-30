@@ -8,7 +8,7 @@ import (
 	"github.com/ysuzuki19/robustruct/internal/logger"
 )
 
-func runInternal(pass *analysis.Pass, namedType *types.Named) (consts []*types.Const) {
+func findConstsInternaly(pass *analysis.Pass, namedType *types.Named) (consts []*types.Const) {
 	info := pass.TypesInfo
 	name := namedType.Obj().Name()
 	var tagType types.Type
