@@ -13,12 +13,10 @@ import (
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name: settings.FeatureConstGroupSwitchCover.String(),
-	Doc:  "checks that all cases in a switch statement with a constant group expression are full arms",
-	URL:  "",
-	Flags: flag.FlagSet{
-		Usage: func() {},
-	},
+	Name:             settings.FeatureConstGroupSwitchCover.String(),
+	Doc:              "checks that all cases in a switch statement with a constant group expression are full arms",
+	URL:              "",
+	Flags:            flag.FlagSet{Usage: func() {}},
 	Run:              run,
 	RunDespiteErrors: false,
 	Requires:         []*analysis.Analyzer{inspect.Analyzer},
