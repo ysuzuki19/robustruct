@@ -54,11 +54,7 @@ func runExternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named
 	cases := []types.Type{}
 	for _, stmt := range ss.Body.List {
 		caseStmt, ok := stmt.(*ast.CaseClause)
-		if !ok {
-			continue
-		}
-
-		if len(caseStmt.List) == 0 {
+		if !ok || len(caseStmt.List) == 0 {
 			continue
 		}
 

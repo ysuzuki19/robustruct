@@ -44,13 +44,7 @@ func runInternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named
 	for _, stmt := range ss.Body.List {
 		// Check if the case statement is a full arm
 		caseStmt, ok := stmt.(*ast.CaseClause)
-		if !ok {
-			continue
-		}
-
-		if len(caseStmt.List) == 0 {
-			// This is a default case, which is always a full arm
-			fmt.Println("Default case found")
+		if !ok || len(caseStmt.List) == 0 {
 			continue
 		}
 
