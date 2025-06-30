@@ -3,6 +3,7 @@ package const_group_switch_cover
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 	"go/types"
 
 	"golang.org/x/tools/go/analysis"
@@ -10,7 +11,7 @@ import (
 	"github.com/ysuzuki19/robustruct/internal/logger"
 )
 
-func runInternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named) {
+func runInternal(pass *analysis.Pass, pos token.Pos, namedType *types.Named, bodyList []ast.Stmt) {
 	info := pass.TypesInfo
 	name := namedType.Obj().Name()
 	var tagType types.Type
@@ -43,7 +44,7 @@ func runInternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named
 	fmt.Println("Constants found:", len(consts))
 
 	cases := []types.Type{}
-	for _, stmt := range ss.Body.List {
+	for _, stmt := range bodyList {
 		caseStmt, ok := stmt.(*ast.CaseClause)
 		if !ok || len(caseStmt.List) == 0 {
 			continue
@@ -53,7 +54,7 @@ func runInternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named
 			if isHardCoded(expr) {
 				logger.Debug("Hard-coded expression found:", expr)
 				pass.Report(analysis.Diagnostic{
-					Pos:            ss.Pos(),
+					Pos:            pos,
 					End:            0,
 					Category:       "",
 					Message:        "robustruct/linters/switch_case_cover: case value requires type related const value",
@@ -71,7 +72,7 @@ func runInternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named
 
 			if !typeEqual(caseType, tagType) {
 				pass.Report(analysis.Diagnostic{
-					Pos:            ss.Pos(),
+					Pos:            pos,
 					End:            0,
 					Category:       "",
 					Message:        "robustruct/linters/switch_case_cover: case value requires type related const value",
@@ -89,7 +90,7 @@ func runInternal(pass *analysis.Pass, ss *ast.SwitchStmt, namedType *types.Named
 
 	if len(consts) != len(cases) {
 		pass.Report(analysis.Diagnostic{
-			Pos:            ss.Pos(),
+			Pos:            pos,
 			End:            0,
 			Category:       "",
 			Message:        "robustruct/linters/switch_case_cover: case body uncovered grouped const value",

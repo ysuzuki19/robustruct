@@ -56,9 +56,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 				isInternal := namedType.Obj().Pkg().Path() == pass.Pkg.Path()
 				if isInternal {
-					runInternal(pass, ss, namedType)
+					runInternal(pass, ss.Pos(), namedType, ss.Body.List)
 				} else {
-					runExternal(pass, ss, namedType)
+					runExternal(pass, ss.Pos(), namedType, ss.Body.List)
 				}
 			}
 			return true
