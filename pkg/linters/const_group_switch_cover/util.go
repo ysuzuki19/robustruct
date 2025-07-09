@@ -7,6 +7,21 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
+func findRelatedComments(pass *analysis.Pass, line int) (relatedComments []string) {
+	for _, commentGroup := range pass.Files[0].Comments {
+		if commentGroup == nil {
+			continue
+		}
+		for _, comment := range commentGroup.List {
+			commentLine := pass.Fset.Position(comment.Pos()).Line
+			if commentLine == line || commentLine+1 == line {
+				relatedComments = append(relatedComments, comment.Text)
+			}
+		}
+	}
+	return relatedComments
+}
+
 func findImport(pass *analysis.Pass, name string) *types.Package {
 	for _, imported := range pass.Pkg.Imports() {
 		importedName := imported.Name()

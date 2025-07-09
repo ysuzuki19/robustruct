@@ -4,6 +4,7 @@ import (
 	"flag"
 	"go/ast"
 	"go/types"
+	"strings"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
@@ -32,6 +33,14 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 		ast.Inspect(file, func(n ast.Node) bool {
 			if ss, ok := n.(*ast.SwitchStmt); ok {
+				for _, comment := range findRelatedComments(pass, pass.Fset.Position(ss.Pos()).Line) {
+					if strings.Contains(comment, "ignore:robustruct") ||
+						strings.Contains(comment, "ignore:"+settings.FeatureConstGroupSwitchCover.String()) {
+						logger.Debug("Ignore comment found:", comment)
+						return true
+					}
+				}
+
 				id, ok := ss.Tag.(*ast.Ident)
 				if !ok || id == nil {
 					return true

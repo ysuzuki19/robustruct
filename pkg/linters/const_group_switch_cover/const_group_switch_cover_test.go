@@ -26,3 +26,8 @@ func TestExternal(t *testing.T) {
 	testdata := analysistest.TestData()
 	analysistest.RunWithSuggestedFixes(t, testdata, const_group_switch_cover.Analyzer, "external")
 }
+
+func TestIgnore(t *testing.T) {
+	testdata := analysistest.TestData()
+	analysistest.RunWithSuggestedFixes(t, testdata, const_group_switch_cover.Analyzer, "ignore")
+}
