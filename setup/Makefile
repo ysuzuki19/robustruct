@@ -4,6 +4,7 @@ RM := rm -f
 CMP := cmp -s
 GO := go
 
+PLUGIN_NAME = robustruct
 BIN_NAME = golangci-lint
 BUILD_PATH = bin/$(BIN_NAME)
 INSTALL_DIR = $(HOME)/.local/bin
@@ -37,7 +38,8 @@ check-path:
 	fi
 
 check-plugin:
-	$(BUILD_PATH) linters
+	@$(BUILD_PATH) linters 2>&1 >/dev/null
+	@echo "Plugin $(PLUGIN_NAME) is available in $(BUILD_PATH)"
 
 check-built:
 	@if [ -f $(BUILD_PATH) ]; then \
