@@ -25,15 +25,6 @@ uninstall:
 
 check: check-path check-built check-bin
 
-check-built:
-	@if [ -f $(BUILD_PATH) ]; then \
-		echo "Built binary exists"; \
-	else \
-		echo "Error: Built binary does not exist"; \
-		echo "Please run 'make build'"; \
-		exit 1; \
-	fi
-
 check-path:
 	@which $(BIN_NAME) > /dev/null 2>&1 || { \
 		echo "Error: $(BIN_NAME) is not in PATH"; \
@@ -43,6 +34,15 @@ check-path:
 		echo "Detected $(BIN_NAME) at desired place."; \
 	else \
 		echo "Error: Detected $(BIN_NAME) at undesired place. Please check PATH alignment"; \
+	fi
+
+check-built:
+	@if [ -f $(BUILD_PATH) ]; then \
+		echo "Built binary exists"; \
+	else \
+		echo "Error: Built binary does not exist"; \
+		echo "Please run 'make build'"; \
+		exit 1; \
 	fi
 
 check-bin:
