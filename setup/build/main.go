@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	os.Args = []string{"", "custom"} // dummy args for building custom linter
+	os.Args = []string{"", "custom", "-vv"} // dummy args for building custom linter
 	if err := commands.Execute(commands.BuildInfo{
 		GoVersion: "",
 		Version:   "",
