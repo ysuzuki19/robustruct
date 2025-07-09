@@ -23,7 +23,7 @@ install: check-built
 uninstall:
 	@$(RM) $(INSTALL_PATH)
 
-check: check-path check-built check-bin
+check: check-path check-built check-plugin check-bin
 
 check-path:
 	@which $(BIN_NAME) > /dev/null 2>&1 || { \
@@ -35,6 +35,9 @@ check-path:
 	else \
 		echo "Error: Detected $(BIN_NAME) at undesired place. Please check PATH alignment"; \
 	fi
+
+check-plugin:
+	$(BUILD_PATH) linters
 
 check-built:
 	@if [ -f $(BUILD_PATH) ]; then \
