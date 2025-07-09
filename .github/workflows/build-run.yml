@@ -20,6 +20,7 @@ jobs:
           cd setup
           make build
           make install
+          make check
 
       - name: Run
         run: |
