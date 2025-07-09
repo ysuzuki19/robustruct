@@ -6,6 +6,7 @@ linters-settings:
         features:
           - "fields_require"
           - "fields_align"
+          - "const_group_switch_cover"
         flags:
           - disable_test
 
